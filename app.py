@@ -7,6 +7,7 @@ from rapidfuzz import fuzz
 import copy # Importado para a nova funcionalidade
 import sys
 import os
+import streamlit.components.v1 as components
 
 # Detectar mudança de menu
 menu_anterior = st.session_state.get("menu_anterior", None)
@@ -28,6 +29,7 @@ menu = st.sidebar.radio("Escolha uma opção:", [
     "🧹 Saneamento de Nomes de Escalas",
     "🗑️ Excluir Arquivo",
     "📁 Exportar Lista de Arquivos e Escalas"
+    "📄 Documentação Recursos (HTML)"
 ])
 
 if menu != menu_anterior:
@@ -694,4 +696,24 @@ if menu == "📁 Exportar Lista de Arquivos e Escalas":
         else:
             st.info("❌ Nenhuma escala encontrada no banco de dados.")
 
-# Forçando atualização
+# Adicione este bloco no final do seu app.py, dentro da função main()
+
+if menu == "📄 Relatório de Referências (HTML)":
+    st.header("📄 Relatório de Referências Cruzadas (gestao de escalas.html)")
+    st.write("Este é o relatório técnico gerado pelo PyInstaller, mostrando as dependências e módulos importados pela aplicação.")
+
+    # Caminho para o seu arquivo HTML dentro do repositório
+    html_file_path = 'build/app/gestao de escalas.html'
+
+    try:
+        with open(html_file_path, 'r', encoding='utf-8') as f:
+            source_code = f.read()
+            
+        with st.container(border=True):
+            # Renderiza o HTML na página
+            components.html(source_code, height=600, scrolling=True)
+
+    except FileNotFoundError:
+        st.error(f"Erro: O arquivo {html_file_path} não foi encontrado no repositório.")
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao tentar ler o arquivo HTML: {e}")
