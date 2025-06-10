@@ -698,8 +698,8 @@ if menu == "📁 Exportar Lista de Arquivos e Escalas":
 
 # Adicione este bloco no final do seu app.py, dentro da função main()
 
-if menu == "📄 Relatório de Referências (HTML)":
-    st.header("📄 Relatório de Referências Cruzadas (gestao de escalas.html)")
+if menu == "📄 Documentação Recursos (HTML)":
+    st.header("📄 Documentação Recursos (gestao de escalas.html)")
     st.write("Este é o relatório técnico gerado pelo PyInstaller, mostrando as dependências e módulos importados pela aplicação.")
 
     # Caminho para o seu arquivo HTML dentro do repositório
