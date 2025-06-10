@@ -257,11 +257,14 @@ if menu == "🧩 Exportar JSON Personalizado":
         else:
             st.info("Nenhuma escala selecionada para exportar. Adicione escalas no Passo 2.")
 
-# 🔎 Substituição em Lote (CÓDIGO CORRIGIDO E COM NOVO DESIGN)
+# 🔎 Substituição em Lote (COM NOVO BOTÃO DE SALVAR)
 if menu == "🔎 Substituição em Lote":
     st.header("🔎 Substituição em Lote")
     st.write("Realize alterações em massa em um campo específico das suas escalas.")
     
+    # ... (O código de seleção de arquivo, tag e regra de substituição permanece o mesmo) ...
+    # ... (Vou omiti-lo aqui para ser breve, mas ele deve ser mantido no seu arquivo) ...
+
     cursor.execute("SELECT id, name FROM jsons")
     rows = cursor.fetchall()
 
@@ -298,7 +301,6 @@ if menu == "🔎 Substituição em Lote":
                         valor_substituir = st.text_input("Substituir o prefixo por", key="lote_replace")
 
                 if st.button("👁️ Pré-visualizar alterações", key="lote_preview_btn", use_container_width=True):
-                    # --- INÍCIO DA LÓGICA QUE ESTAVA FALTANDO ---
                     dados_preview = []
                     json_modificado = copy.deepcopy(original_data)
                     novas_escalas = []
@@ -308,15 +310,12 @@ if menu == "🔎 Substituição em Lote":
                             valor_original_tag = esc.get(tag_selecionada)
                             if valor_original_tag and isinstance(valor_original_tag, str) and valor_original_tag.startswith(valor_localizar):
                                 nova_escala = copy.deepcopy(esc)
-                                
                                 valor_antigo_tag = nova_escala[tag_selecionada]
                                 novo_valor_tag = valor_substituir + valor_antigo_tag[len(valor_localizar):]
                                 nova_escala[tag_selecionada] = novo_valor_tag
-                                
                                 nome_antigo_escala = nova_escala.get("NOME", "")
                                 novo_nome_escala = f"{nome_antigo_escala} - {valor_substituir}"
                                 nova_escala["NOME"] = novo_nome_escala
-                                
                                 novas_escalas.append(nova_escala)
                                 dados_preview.append({
                                     "Nome Original": nome_antigo_escala,
@@ -329,46 +328,86 @@ if menu == "🔎 Substituição em Lote":
                         json_modificado["escalas"].extend(novas_escalas)
                         st.session_state['dados_preview'] = dados_preview
                         st.session_state['json_modificado'] = json_modificado
+                        st.session_state['novas_escalas'] = novas_escalas # <-- SALVANDO AS NOVAS ESCALAS NO ESTADO
                         st.session_state['selected_id_lote'] = selected_id
                         st.session_state['selected_name_lote'] = selected_name
                     else:
                         st.warning("Nenhum registro encontrado com o critério especificado.")
                         if 'dados_preview' in st.session_state:
                             del st.session_state['dados_preview']
-                    # --- FIM DA LÓGICA QUE ESTAVA FALTANDO ---
 
+            # --- A LÓGICA DE EXIBIÇÃO E SALVAMENTO FOI ALTERADA A PARTIR DAQUI ---
             if 'dados_preview' in st.session_state and st.session_state['dados_preview']:
                 with st.container(border=True):
-                    st.markdown("#### 📊 Passo 3: Confirme as Alterações")
-                    st.success(f"Serão **criados {len(st.session_state['dados_preview'])} novos registros** de escala com os valores abaixo.")
+                    st.markdown("#### 📊 Passo 3: Confirme e Salve as Alterações")
+                    st.success(f"Foram encontradas {len(st.session_state['dados_preview'])} escalas. Serão **criados {len(st.session_state['dados_preview'])} novos registros** de escala com os valores abaixo.")
                     
                     df_preview = pd.DataFrame(st.session_state['dados_preview'])
                     st.dataframe(df_preview, use_container_width=True)
 
-                    st.markdown("##### 💾 Salvar alterações")
-                    opcao = st.radio("Como deseja salvar?", ["Sobrescrever arquivo existente", "Salvar como novo arquivo"], key="lote_save_option", horizontal=True)
+                    st.divider()
+                    
+                    col_salvar1, col_salvar2 = st.columns(2)
 
-                    novo_nome_arquivo = ""
-                    if opcao == "Salvar como novo arquivo":
-                        novo_nome_arquivo = st.text_input("Nome do novo arquivo:", value=st.session_state['selected_name_lote'].replace(".json", "_modificado.json"), key="lote_new_name")
+                    with col_salvar1:
+                        st.markdown("##### 💾 Opção 1: Salvar Tudo")
+                        st.write("Adiciona as novas escalas ao arquivo original e salva o resultado.")
+                        opcao = st.radio("Como deseja salvar?", ["Sobrescrever arquivo existente", "Salvar como novo arquivo"], key="lote_save_option", horizontal=True, label_visibility="collapsed")
 
-                    if st.button("✅ Salvar Agora", key="lote_save_btn", use_container_width=True, type="primary"):
-                        json_final = st.session_state['json_modificado']
+                        novo_nome_tudo = ""
+                        if opcao == "Salvar como novo arquivo":
+                            novo_nome_tudo = st.text_input("Nome do novo arquivo:", value=st.session_state['selected_name_lote'].replace(".json", "_modificado.json"), key="lote_new_name_all")
+
+                        if st.button("Salvar Tudo Agora", key="lote_save_btn_all", use_container_width=True, type="primary"):
+                            json_final = st.session_state['json_modificado']
+                            if opcao == "Sobrescrever arquivo existente":
+                                salvar_no_banco(conn, json_final, selected_id=st.session_state['selected_id_lote'])
+                                st.success("✅ Alterações salvas no arquivo original.")
+                            elif opcao == "Salvar como novo arquivo":
+                                if not novo_nome_tudo.strip():
+                                    st.error("❌ Informe um nome para o novo arquivo.")
+                                else:
+                                    salvar_no_banco(conn, json_final, nome=novo_nome_tudo.strip())
+                                    st.success(f"✅ Novo arquivo '{novo_nome_tudo}' salvo com sucesso!")
+                            
+                            for key in list(st.session_state.keys()): # Limpeza geral
+                                if key != 'menu_anterior': del st.session_state[key]
+                            st.rerun()
+
+                    with col_salvar2:
+                        st.markdown("##### 💾 Opção 2: Salvar Somente Novas")
+                        st.write("Cria um novo arquivo contendo apenas as escalas geradas no lote.")
                         
-                        if opcao == "Sobrescrever arquivo existente":
-                            salvar_no_banco(conn, json_final, selected_id=st.session_state['selected_id_lote'])
-                            st.success("✅ Alterações salvas no arquivo original.")
-                        elif opcao == "Salvar como novo arquivo":
-                            if not novo_nome_arquivo.strip():
+                        novo_nome_novas = st.text_input("Nome do novo arquivo:", value=st.session_state['selected_name_lote'].replace(".json", "_apenas_novas.json"), key="lote_new_name_only")
+
+                        if st.button("Salvar Somente Novas", key="lote_save_btn_only", use_container_width=True):
+                            if not novo_nome_novas.strip():
                                 st.error("❌ Informe um nome para o novo arquivo.")
                             else:
-                                salvar_no_banco(conn, json_final, nome=novo_nome_arquivo.strip())
-                                st.success(f"✅ Novo arquivo '{novo_nome_arquivo}' salvo com sucesso!")
-                        
-                        for key in ['dados_preview', 'json_modificado', 'selected_id_lote', 'selected_name_lote']:
-                            if key in st.session_state:
-                                del st.session_state[key]
-                        st.rerun()
+                                with st.spinner("Preparando novo arquivo..."):
+                                    # Lógica para criar o JSON apenas com as novas escalas
+                                    escalas_novas = st.session_state['novas_escalas']
+                                    jornadas_originais = st.session_state['json_modificado'].get('jornadas', {})
+                                    horas_originais = st.session_state['json_modificado'].get('horas_adicionais', {})
+                                    
+                                    ids_jornadas_necessarias = set()
+                                    for esc in escalas_novas:
+                                        ids_jornadas_necessarias.update(esc.get('JORNADAS', []))
+                                    
+                                    jornadas_filtradas = {k: v for k, v in jornadas_originais.items() if k in ids_jornadas_necessarias}
+
+                                    json_apenas_novas = {
+                                        "escalas": escalas_novas,
+                                        "jornadas": jornadas_filtradas,
+                                        "horas_adicionais": horas_originais
+                                    }
+                                    
+                                    salvar_no_banco(conn, json_apenas_novas, nome=novo_nome_novas.strip())
+                                    st.success(f"✅ Novo arquivo '{novo_nome_novas}' com apenas as novas escalas salvo com sucesso!")
+                                
+                                for key in list(st.session_state.keys()): # Limpeza geral
+                                    if key != 'menu_anterior': del st.session_state[key]
+                                st.rerun()
 
 
 # 🔗 Unificação de Jornadas
