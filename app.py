@@ -702,7 +702,7 @@ if menu == "📄 Documentação Recursos (HTML)":
     st.write("Este é o relatório técnico gerado pelo PyInstaller, mostrando as dependências e módulos importados pela aplicação.")
 
     # Caminho para o seu arquivo HTML dentro do repositório
-    html_file_path = 'build/app/gestao de escalas.html'
+    html_file_path = 'gestao de escalas.html'
 
     try:
         with open(html_file_path, 'r', encoding='utf-8') as f:
