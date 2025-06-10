@@ -8,14 +8,6 @@ import copy # Importado para a nova funcionalidade
 import sys
 import os
 
-def resource_path(relative_path):
-    """ Retorna o caminho absoluto para o recurso, funciona para dev e para PyInstaller """
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
 # Detectar mudança de menu
 menu_anterior = st.session_state.get("menu_anterior", None)
 
@@ -662,3 +654,5 @@ if menu == "📁 Exportar Lista de Arquivos e Escalas":
             )
         else:
             st.info("❌ Nenhuma escala encontrada no banco de dados.")
+
+# Forçando atualização
