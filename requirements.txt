@@ -1,0 +1,5 @@
+streamlit
+pandas
+plotly
+rapidfuzz
+# Adicione qualquer outra biblioteca que você tenha importado
