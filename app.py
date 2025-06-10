@@ -28,7 +28,7 @@ menu = st.sidebar.radio("Escolha uma opção:", [
     "📥 Importar Lista de Escalas (TXT)",
     "🧹 Saneamento de Nomes de Escalas",
     "🗑️ Excluir Arquivo",
-    "📁 Exportar Lista de Arquivos e Escalas"
+    "📁 Exportar Lista de Arquivos e Escalas",
     "📄 Documentação Recursos (HTML)"
 ])
 
@@ -696,7 +696,6 @@ if menu == "📁 Exportar Lista de Arquivos e Escalas":
         else:
             st.info("❌ Nenhuma escala encontrada no banco de dados.")
 
-# Adicione este bloco no final do seu app.py, dentro da função main()
 
 if menu == "📄 Documentação Recursos (HTML)":
     st.header("📄 Documentação Recursos (gestao de escalas.html)")
