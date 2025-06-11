@@ -20,7 +20,7 @@ conn.commit()
 st.set_page_config(page_title="Sistema de Escalas", layout="wide")
 st.sidebar.title("⚙️ Menu")
 menu = st.sidebar.radio("Escolha uma opção:", [
-    "📄 Documentação Recursos (HTML)",
+    "📄 Documentação Recursos",
     "📥 Importar Escala",
     "✏️ Editar JSON",
     "🧩 Exportar JSON Personalizado",
