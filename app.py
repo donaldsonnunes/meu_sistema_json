@@ -697,7 +697,7 @@ if menu == "📁 Exportar Lista de Arquivos e Escalas":
             st.info("❌ Nenhuma escala encontrada no banco de dados.")
 
 
-if menu == "📄 Documentação Recursos (HTML)":
+if menu == "📄 Documentação Recursos":
     st.header("📄 Documentação Recursos (gestao de escalas.html)")
     st.write("Este é o relatório técnico gerado pelo PyInstaller, mostrando as dependências e módulos importados pela aplicação.")
 
