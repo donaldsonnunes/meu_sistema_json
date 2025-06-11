@@ -11,25 +11,29 @@
             margin: 0 auto;
             max-width: 800px;
             padding: 20px;
+            background-color: #ffffff; /* Fundo branco */
+            color: #212529; /* Cor do texto principal (escuro) */
         }
         h1, h2, h3, h4 {
-            color: #2c3e50;
-            border-bottom: 1px solid #ecf0f1;
+            color: #000000; /* Títulos em preto */
+            border-bottom: 1px solid #dee2e6;
             padding-bottom: 10px;
         }
         p, li {
-            color: #34495e;
+            color: #343a40; /* Cor do parágrafo (escuro) */
         }
         code {
-            background-color: #ecf0f1;
-            padding: 2px 4px;
-            border-radius: 3px;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 2px 5px;
+            border-radius: 4px;
         }
         .note {
-            background-color: #fdf5e6;
-            border-left: 5px solid #f39c12;
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
             padding: 15px;
             margin: 15px 0;
+            color: #664d03;
         }
     </style>
 </head>
@@ -54,7 +58,7 @@
     <h4>📥 <b>Importar Escala</b></h4>
     <ul>
         <li><b>O que faz:</b> Permite carregar um ou mais arquivos no formato <code>.json</code> para dentro do sistema.</li>
-        <li><b>Como usar:</b> Clique no botão "Browse files" ou arraste os arquivos JSON para a área designada. O sistema processará cada arquivo e os salvará no banco de dados, tornando-os disponíveis para as outras funcionalidades.</li>
+        <li><b>Como usar:</b> Clique no botão "Browse files" ou arraste os arquivos JSON para a área designada. O sistema processará cada arquivo e os salvará no banco de dados.</li>
     </ul>
 
     <h4>✏️ <b>Editar JSON</b></h4>
@@ -66,7 +70,7 @@
                 <li>Escolha o tipo de entidade: "Escala", "Jornada" ou "Hora Adicional".</li>
                 <li>Selecione o item específico pelo nome.</li>
                 <li>Escolha a "tag" (o campo) que deseja alterar.</li>
-                <li>Digite o novo valor e clique em "Salvar agora", escolhendo entre sobrescrever o arquivo ou salvar como uma nova versão.</li>
+                <li>Digite o novo valor e clique em "Salvar agora".</li>
             </ol>
         </li>
     </ul>
@@ -74,67 +78,41 @@
     <h4>🧩 <b>Exportar JSON Personalizado</b></h4>
     <ul>
         <li><b>O que faz:</b> Cria um novo arquivo JSON customizado, contendo apenas as escalas que você selecionar.</li>
-        <li><b>Como usar:</b>
-            <ol>
-                <li><b>Fonte de Dados:</b> Escolha se deseja buscar escalas em todos os arquivos ou em um arquivo específico.</li>
-                <li><b>Seleção de Escalas:</b> Você pode buscar escalas pelo nome e adicioná-las a uma lista de seleção.</li>
-                <li><b>Exportar Todas:</b> Se estiver filtrando por um arquivo, uma opção "Exportar todas as escalas do arquivo base" aparecerá, permitindo pular a seleção manual.</li>
-                <li><b>Exportação:</b> Após confirmar sua seleção, o sistema gera uma pré-visualização do JSON final e disponibiliza botões para baixar o <code>.json</code> completo e um resumo em <code>.txt</code>.</li>
-            </ol>
-        </li>
     </ul>
 
     <h4>🔎 <b>Substituição em Lote</b></h4>
     <ul>
-        <li><b>O que faz:</b> Uma poderosa ferramenta para encontrar e substituir textos em um campo específico de múltiplas escalas de uma só vez, criando novas cópias das escalas alteradas.</li>
-        <li><b>Como usar:</b>
-            <ol>
-                <li><b>Passo 1: Alvo:</b> Selecione o arquivo JSON e a "tag" (campo) onde a substituição deve ocorrer (ex: "COD").</li>
-                <li><b>Passo 2: Regra:</b> Informe o texto a ser localizado (o sistema busca pelo prefixo) e o novo texto que o substituirá.</li>
-                <li><b>Passo 3: Confirmação:</b> Clique em "Pré-visualizar alterações". O sistema mostrará uma tabela com todas as mudanças propostas, incluindo a alteração do campo e a sugestão de um novo nome para a escala (ex: <code>Nome Antigo - Valor de Substituição</code>).</li>
-                <li><b>Salvamento:</b> A tela de salvamento oferece duas opções distintas:
-                    <ul>
-                        <li><b>Opção 1: Salvar Tudo:</b> Adiciona as novas escalas modificadas ao arquivo original.</li>
-                        <li><b>Opção 2: Salvar Somente Novas:</b> Cria um novo arquivo contendo apenas as escalas que foram geradas no lote.</li>
-                    </ul>
-                </li>
-            </ol>
-        </li>
+        <li><b>O que faz:</b> Ferramenta para encontrar e substituir textos em um campo específico de múltiplas escalas, criando novas cópias das escalas alteradas.</li>
     </ul>
 
     <h4>🔗 <b>Unificação de Jornadas</b></h4>
     <ul>
         <li><b>O que faz:</b> Ajuda a limpar a base de dados encontrando e unificando jornadas de trabalho com nomes duplicados ou muito semelhantes.</li>
-        <li><b>Como usar:</b>
-            <ul>
-                <li><b>Unificação Automática:</b> Um botão permite unificar automaticamente todas as jornadas que têm nomes 100% idênticos.</li>
-                <li><b>Unificação Manual:</b> O sistema exibe uma lista de pares de jornadas com nomes que são 90% ou mais semelhantes. Você pode marcar os pares que deseja unificar e, com um clique, o sistema substitui as referências da segunda jornada pela primeira e a remove.</li>
-            </ul>
-        </li>
     </ul>
 
     <h4>📥 <b>Importar Lista de Escalas (TXT)</b></h4>
     <ul>
         <li><b>O que faz:</b> Permite gerar um JSON personalizado a partir de uma simples lista de nomes de escalas contida em um arquivo <code>.txt</code>.</li>
-        <li><b>Como usar:</b> Faça o upload de um arquivo <code>.txt</code> com um nome de escala por linha. O sistema buscará no banco de dados por escalas que correspondam exatamente a esses nomes e montará um arquivo JSON com elas e suas dependências, pronto para ser exportado.</li>
     </ul>
 
     <h4>🧹 <b>Saneamento de Nomes de Escalas</b></h4>
     <ul>
-        <li><b>O que faz:</b> Aplica um conjunto de regras de padronização para corrigir e normalizar os nomes de todas as escalas em todos os arquivos do banco de dados (ex: ajusta formatos de data, remove acentos, padroniza siglas de dias da semana).</li>
-        <li><b>Como usar:</b> Basta clicar no botão "Iniciar Saneamento". A ação percorrerá toda a base de dados. Ao final, uma lista de todas as alterações realizadas será exibida.</li>
+        <li><b>O que faz:</b> Aplica um conjunto de regras de padronização para corrigir e normalizar os nomes de todas as escalas.</li>
     </ul>
 
     <h4>🗑️ <b>Excluir Arquivo</b></h4>
     <ul>
-        <li><b>O que faz:</b> Remove permanentemente um arquivo JSON e todos os seus dados associados do sistema.</li>
-        <li><b>Como usar:</b> Selecione o arquivo desejado na lista e clique no botão "Excluir Permanentemente". <p class="note"><b>Atenção:</b> esta ação não pode ser desfeita.</p></li>
+        <li><b>O que faz:</b> Remove permanentemente um arquivo JSON do sistema. <p class="note"><b>Atenção:</b> esta ação não pode ser desfeita.</p></li>
     </ul>
 
     <h4>📁 <b>Exportar Lista de Arquivos e Escalas</b></h4>
     <ul>
-        <li><b>O que faz:</b> Gera um relatório simples em formato <code>.csv</code> que lista todos os arquivos importados e os nomes de todas as escalas contidas em cada um.</li>
-        <li><b>Como usar:</b> A tela exibe a tabela de dados e um botão para baixar o arquivo CSV.</li>
+        <li><b>O que faz:</b> Gera um relatório <code>.csv</code> que lista todos os arquivos e as escalas contidas em cada um.</li>
+    </ul>
+
+    <h4>📄 <b>Relatório de Referências (HTML)</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Exibe o relatório técnico de referências cruzadas gerado pelo PyInstaller.</li>
     </ul>
 
 </body>
