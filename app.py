@@ -149,8 +149,7 @@ def pagina_edicao_em_lote():
                             nome_antigo_escala = nova_escala.get("NOME", "")
                             novo_nome_escala = f"{nome_antigo_escala} - {valor_substituir}"
                             nova_escala["NOME"] = novo_nome_escala
-                            # <-- CORREÇÃO AQUI -->
-                            nova_escala["key"] = uuid.uuid4().hex
+                            nova_escala["key"] = uuid.uuid4().hex  # <-- CORREÇÃO AQUI
                             novas_escalas.append(nova_escala)
                             dados_preview.append({"Nome Original": nome_antigo_escala, "Novo Nome Proposto": novo_nome_escala, f"Valor Original ({tag_selecionada})": valor_antigo_tag, f"Valor Proposto ({tag_selecionada})": novo_valor_tag})
                 
@@ -205,36 +204,43 @@ def pagina_edicao_em_lote():
 
 def pagina_exportar_json_personalizado():
     st.header("🧩 Exportar JSON Personalizado")
-    st.sidebar.header("Opções de Exportação")
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM jsons ORDER BY name")
-    files = [row[0] for row in cursor.fetchall()]
-    if not files:
-        st.warning("Nenhum arquivo JSON disponível para exportação."); return
-        
-    selected_file = st.sidebar.selectbox("Arquivo de origem:", files, key="export_select")
-    if selected_file:
-        cursor.execute("SELECT data FROM jsons WHERE name = ?", (selected_file,))
-        result = cursor.fetchone()
-        if result:
-            json_data = json.loads(result[0])
-            scale_options = {scale.get("key"): scale.get("NOME") for scale in json_data.get("escalas", [])}
-            selected_scales_keys = st.sidebar.multiselect("Selecione as escalas:", options=list(scale_options.keys()), format_func=lambda k: scale_options.get(k, k))
-            if selected_scales_keys:
-                if st.button("Gerar e Baixar JSON", use_container_width=True, type="primary"):
-                    used_jornada_keys = {j_key for scale in json_data.get("escalas", []) if scale.get("key") in selected_scales_keys for j_key in scale.get("JORNADAS", [])}
-                    filtered_jornadas = {key: jornada for key, jornada in json_data.get("jornadas", {}).items() if key in used_jornada_keys}
-                    new_json_data = {
-                        "escalas": [s for s in json_data.get("escalas", []) if s.get("key") in selected_scales_keys],
-                        "jornadas": filtered_jornadas,
-                        "horas_adicionais": json_data.get("horas_adicionais", [])
-                    }
-                    st.session_state.export_data = json.dumps(new_json_data, indent=4, ensure_ascii=False)
-                    st.session_state.export_filename = f"personalizado_{selected_file}"
-                    st.success("JSON personalizado pronto para download!")
+    
+    # Widgets de opção movidos da sidebar para a página principal
+    with st.container(border=True):
+        st.markdown("#### Opções de Exportação")
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM jsons ORDER BY name")
+        files = [row[0] for row in cursor.fetchall()]
+        if not files:
+            st.warning("Nenhum arquivo JSON disponível para exportação."); return
+            
+        selected_file = st.selectbox("Arquivo de origem:", files, key="export_select")
+        selected_scales_keys = []
+        if selected_file:
+            cursor.execute("SELECT data FROM jsons WHERE name = ?", (selected_file,))
+            result = cursor.fetchone()
+            if result:
+                json_data = json.loads(result[0])
+                scale_options = {scale.get("key"): scale.get("NOME") for scale in json_data.get("escalas", [])}
+                selected_scales_keys = st.multiselect("Selecione as escalas:", options=list(scale_options.keys()), format_func=lambda k: scale_options.get(k, k))
+
+    if selected_file and selected_scales_keys:
+        if st.button("Gerar e Baixar JSON", use_container_width=True, type="primary"):
+            used_jornada_keys = {j_key for scale in json_data.get("escalas", []) if scale.get("key") in selected_scales_keys for j_key in scale.get("JORNADAS", [])}
+            filtered_jornadas = {key: jornada for key, jornada in json_data.get("jornadas", {}).items() if key in used_jornada_keys}
+            new_json_data = {
+                "escalas": [s for s in json_data.get("escalas", []) if s.get("key") in selected_scales_keys],
+                "jornadas": filtered_jornadas,
+                "horas_adicionais": json_data.get("horas_adicionais", [])
+            }
+            st.session_state.export_data = json.dumps(new_json_data, indent=4, ensure_ascii=False)
+            st.session_state.export_filename = f"personalizado_{selected_file}"
+            st.success("JSON personalizado pronto para download!")
+    
     if 'export_data' in st.session_state:
         st.download_button(label="📥 Baixar JSON Personalizado", data=st.session_state.export_data, file_name=st.session_state.export_filename, mime="application/json")
         with st.expander("Visualizar JSON Gerado"): st.json(st.session_state.export_data)
+
 
 def pagina_duplicar_para_coligadas():
     st.header("🔎 Duplicar para Coligadas/Filiais")
@@ -289,8 +295,7 @@ def pagina_duplicar_para_coligadas():
                             nome_antigo_escala = nova_escala.get("NOME", "")
                             novo_nome_escala = f"{nome_antigo_escala} (Cópia: {valor_substituir})"
                             nova_escala["NOME"] = novo_nome_escala
-                            # <-- CORREÇÃO AQUI -->
-                            nova_escala["key"] = uuid.uuid4().hex
+                            nova_escala["key"] = uuid.uuid4().hex # <-- CORREÇÃO AQUI
                             novas_escalas.append(nova_escala)
                             dados_preview.append({"Nome Original": nome_antigo_escala, "Novo Nome Proposto": novo_nome_escala, f"Valor Original ({tag_selecionada})": valor_antigo_tag, f"Valor Proposto ({tag_selecionada})": novo_valor_tag})
                 
@@ -345,9 +350,9 @@ def pagina_duplicar_para_coligadas():
 
 def pagina_gerar_escalas_csv():
     st.header("📊 Gerar Escalas por CSV")
-    st.sidebar.header("Opções do Processador")
-    uploaded_file = st.sidebar.file_uploader("Selecione .csv ou .xlsx", type=["csv", "xlsx"], key="csv_uploader")
-    process_button = st.sidebar.button("🚀 Processar Escalas", disabled=(not uploaded_file))
+    st.info("Carregue um arquivo CSV ou XLSX para convertê-lo em um arquivo JSON estruturado.")
+    uploaded_file = st.file_uploader("Selecione .csv ou .xlsx", type=["csv", "xlsx"], key="csv_uploader")
+    process_button = st.button("🚀 Processar Escalas", disabled=(not uploaded_file), use_container_width=True)
 
     if process_button and uploaded_file:
         try:
@@ -379,13 +384,12 @@ def pagina_gerar_escalas_csv():
 
 def pagina_excluir_arquivo():
     st.header("🗑️ Excluir Arquivo")
-    st.sidebar.header("Opções de Exclusão")
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM jsons ORDER BY name")
     files_to_delete = [row[0] for row in cursor.fetchall()]
     if not files_to_delete:
         st.warning("Nenhum arquivo para excluir."); return
-    file_to_delete = st.sidebar.selectbox("Arquivo para excluir:", files_to_delete, index=None, placeholder="Selecione...")
+    file_to_delete = st.selectbox("Arquivo para excluir:", files_to_delete, index=None, placeholder="Selecione...")
     if file_to_delete:
         st.warning(f"Tem certeza que deseja excluir '{file_to_delete}'? Esta ação é irreversível.")
         if st.button("Confirmar Exclusão", type="primary"):
@@ -419,31 +423,28 @@ def main():
     """Função principal que organiza a UI e o roteamento."""
     st.sidebar.title("⚙️ Menu")
 
-    # Mapeia os nomes do menu para as funções de página correspondentes
     PAGES = {
         "📄 Documentação Recursos": pagina_documentacao,
         "📥 Importar Escala": pagina_importar_escala,
         "📝 Edição em Lote": pagina_edicao_em_lote,
         "🧩 Exportar JSON Personalizado": pagina_exportar_json_personalizado,
-        #"🔎 Duplicar para coligadas/filiais": pagina_duplicar_para_coligadas,
+        "🔎 Duplicar para coligadas/filiais": pagina_duplicar_para_coligadas,
         "📊 Gerar escalas através de CSV": pagina_gerar_escalas_csv,
         "🗑️ Excluir Arquivo": pagina_excluir_arquivo,
         "📁 Exportar Lista de Arquivos e Escalas": pagina_exportar_lista,
     }
 
-    # Inicializa o estado da página, se não existir
     if 'page' not in st.session_state:
         st.session_state.page = "📄 Documentação Recursos"
 
     # Cria os botões do menu na sidebar
     for page_name in PAGES.keys():
         if st.sidebar.button(page_name, use_container_width=True, key=f"btn_{page_name}"):
-            # Se o botão for clicado, atualiza a página no estado da sessão
             if st.session_state.page != page_name:
                 st.session_state.page = page_name
-                st.rerun() # Força o recarregamento da página
+                st.rerun()
 
-    # Chama a função da página atualmente selecionada
+    # Chama a função da página selecionada
     page_function = PAGES[st.session_state.page]
     page_function()
 
