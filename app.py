@@ -9,7 +9,7 @@ import copy
 import os
 import streamlit.components.v1 as components
 from datetime import datetime
-import uuid  # <-- CORREÇÃO: Importa a biblioteca correta para gerar UUIDs
+import uuid
 
 # =====================================================================================
 # CONFIGURAÇÃO INICIAL E CONEXÃO COM BANCO DE DADOS
@@ -149,7 +149,7 @@ def pagina_edicao_em_lote():
                             nome_antigo_escala = nova_escala.get("NOME", "")
                             novo_nome_escala = f"{nome_antigo_escala} - {valor_substituir}"
                             nova_escala["NOME"] = novo_nome_escala
-                            nova_escala["key"] = uuid.uuid4().hex  # <-- CORREÇÃO AQUI
+                            nova_escala["key"] = uuid.uuid4().hex
                             novas_escalas.append(nova_escala)
                             dados_preview.append({"Nome Original": nome_antigo_escala, "Novo Nome Proposto": novo_nome_escala, f"Valor Original ({tag_selecionada})": valor_antigo_tag, f"Valor Proposto ({tag_selecionada})": novo_valor_tag})
                 
@@ -205,7 +205,7 @@ def pagina_edicao_em_lote():
 def pagina_exportar_json_personalizado():
     st.header("🧩 Exportar JSON Personalizado")
     
-    # Widgets de opção movidos da sidebar para a página principal
+    # CORREÇÃO: Widgets movidos da sidebar para a página principal
     with st.container(border=True):
         st.markdown("#### Opções de Exportação")
         cursor = conn.cursor()
@@ -240,7 +240,6 @@ def pagina_exportar_json_personalizado():
     if 'export_data' in st.session_state:
         st.download_button(label="📥 Baixar JSON Personalizado", data=st.session_state.export_data, file_name=st.session_state.export_filename, mime="application/json")
         with st.expander("Visualizar JSON Gerado"): st.json(st.session_state.export_data)
-
 
 def pagina_duplicar_para_coligadas():
     st.header("🔎 Duplicar para Coligadas/Filiais")
@@ -295,7 +294,7 @@ def pagina_duplicar_para_coligadas():
                             nome_antigo_escala = nova_escala.get("NOME", "")
                             novo_nome_escala = f"{nome_antigo_escala} (Cópia: {valor_substituir})"
                             nova_escala["NOME"] = novo_nome_escala
-                            nova_escala["key"] = uuid.uuid4().hex # <-- CORREÇÃO AQUI
+                            nova_escala["key"] = uuid.uuid4().hex
                             novas_escalas.append(nova_escala)
                             dados_preview.append({"Nome Original": nome_antigo_escala, "Novo Nome Proposto": novo_nome_escala, f"Valor Original ({tag_selecionada})": valor_antigo_tag, f"Valor Proposto ({tag_selecionada})": novo_valor_tag})
                 
@@ -351,6 +350,8 @@ def pagina_duplicar_para_coligadas():
 def pagina_gerar_escalas_csv():
     st.header("📊 Gerar Escalas por CSV")
     st.info("Carregue um arquivo CSV ou XLSX para convertê-lo em um arquivo JSON estruturado.")
+    
+    # CORREÇÃO: Widgets movidos da sidebar para a página principal
     uploaded_file = st.file_uploader("Selecione .csv ou .xlsx", type=["csv", "xlsx"], key="csv_uploader")
     process_button = st.button("🚀 Processar Escalas", disabled=(not uploaded_file), use_container_width=True)
 
@@ -389,6 +390,7 @@ def pagina_excluir_arquivo():
     files_to_delete = [row[0] for row in cursor.fetchall()]
     if not files_to_delete:
         st.warning("Nenhum arquivo para excluir."); return
+        
     file_to_delete = st.selectbox("Arquivo para excluir:", files_to_delete, index=None, placeholder="Selecione...")
     if file_to_delete:
         st.warning(f"Tem certeza que deseja excluir '{file_to_delete}'? Esta ação é irreversível.")
@@ -423,6 +425,7 @@ def main():
     """Função principal que organiza a UI e o roteamento."""
     st.sidebar.title("⚙️ Menu")
 
+    # Mapeia os nomes do menu para as funções de página correspondentes
     PAGES = {
         "📄 Documentação Recursos": pagina_documentacao,
         "📥 Importar Escala": pagina_importar_escala,
@@ -434,18 +437,11 @@ def main():
         "📁 Exportar Lista de Arquivos e Escalas": pagina_exportar_lista,
     }
 
-    if 'page' not in st.session_state:
-        st.session_state.page = "📄 Documentação Recursos"
-
-    # Cria os botões do menu na sidebar
-    for page_name in PAGES.keys():
-        if st.sidebar.button(page_name, use_container_width=True, key=f"btn_{page_name}"):
-            if st.session_state.page != page_name:
-                st.session_state.page = page_name
-                st.rerun()
+    # Usa um selectbox para o menu, que é mais estável para navegação entre "páginas"
+    selection = st.sidebar.radio("Escolha uma opção:", list(PAGES.keys()), key="main_menu")
 
     # Chama a função da página selecionada
-    page_function = PAGES[st.session_state.page]
+    page_function = PAGES[selection]
     page_function()
 
 if __name__ == "__main__":
