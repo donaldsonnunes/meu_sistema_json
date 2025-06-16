@@ -1,0 +1,1096 @@
+{
+    "escalas": [
+        {
+            "NOME": "0001PA SEG A QUIN 08:00 AS 18:00 SEX 08:00:00 AS 17:00:00",
+            "DESC_ESCALA": "SEG A QUIN 08:00 AS 18:00 SEX 08:00:00 AS 17:00:00",
+            "COD": "1",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "3edd5d3a4c534d1ea57152fd",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "aa13a7398d5c43e2bc10bb7c"
+        },
+        {
+            "NOME": "0002PA SEG A SEX 08:00 AS 17:00 E SAB 08:00 AS 12:00",
+            "DESC_ESCALA": "SEG A SEX 08:00 AS 17:00 E SAB 08:00 AS 12:00",
+            "COD": "2",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "72f62545aa834600a2d4f7de",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "1387633ca5e2420d9ea4dd80"
+        },
+        {
+            "NOME": "0003PA SEG A SEX 08:00 AS 17:00",
+            "DESC_ESCALA": "SEG A SEX 08:00 AS 17:00",
+            "COD": "3",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "8ee89f11cbb84c4fae5bf0bc",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "3e824cb9e3664f5abea5b996"
+        },
+        {
+            "NOME": "0004 SEG A SEX 11:00 AS 20:00 RECIFE",
+            "DESC_ESCALA": "SEG A SEX 11:00 AS 20:00 RECIFE",
+            "COD": "4",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "7bd4b9b2c9d549b7bfdcdf3c",
+                "7bd4b9b2c9d549b7bfdcdf3c",
+                "7bd4b9b2c9d549b7bfdcdf3c",
+                "7bd4b9b2c9d549b7bfdcdf3c",
+                "7bd4b9b2c9d549b7bfdcdf3c",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "6846253695bc451bb3770471"
+        },
+        {
+            "NOME": "0006PA 12X36 DIURNO",
+            "DESC_ESCALA": "0006PA 12X36 DIURNO",
+            "COD": "5",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "158df1f3e4cf43c6a653a930"
+        },
+        {
+            "NOME": "0007PA 12X36 NOTURNO",
+            "DESC_ESCALA": "0007PA 12X36 NOTURNO",
+            "COD": "6",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "f1ef0c4b9f0f450db29b5990",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "166675e0f79347c897fefab9"
+        },
+        {
+            "NOME": "0008 SEG A QUI 12:00 AS 22:00 SEX 12:00 AS 21:00",
+            "DESC_ESCALA": "0008 SEG A QUI 12:00 AS 22:00 SEX 12:00 AS 21:00",
+            "COD": "7",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "e6052b1300c34d5aac9c157a",
+                "e6052b1300c34d5aac9c157a",
+                "e6052b1300c34d5aac9c157a",
+                "e6052b1300c34d5aac9c157a",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "226543c6c1524133893fb8d8"
+        },
+        {
+            "NOME": "0009PA 2a 5a 07:00 AS 17:00 / SEX 07:00 AS 16:00",
+            "DESC_ESCALA": "0009PA 2a 5a 07:00 AS 17:00 / SEX 07:00 AS 16:00",
+            "COD": "8",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "8a0465382bb14e25b3283cc1",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "8a0465382bb14e25b3283cc1",
+                "6ea19116955d4747b2d29289",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "8215005d1c464556a8de6854"
+        },
+        {
+            "NOME": "0010 SEG A QUI 10:00 AS 20:00 SEX 10:00 AS 19:00",
+            "DESC_ESCALA": "0010 SEG A QUI 10:00 AS 20:00 SEX 10:00 AS 19:00",
+            "COD": "9",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "dda06d93a3cb438a99997002",
+                "dda06d93a3cb438a99997002",
+                "dda06d93a3cb438a99997002",
+                "dda06d93a3cb438a99997002",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "b516c74dd0934b088646a0dc"
+        },
+        {
+            "NOME": "0011 SEG A QUI 09:00 AS 19:00 SEX DAS 09:00 AS 18:00",
+            "DESC_ESCALA": "0011 SEG A QUI 09:00 AS 19:00 SEX DAS 09:00 AS 18:00",
+            "COD": "10",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "37dfaceef6f84f3d80350971",
+                "37dfaceef6f84f3d80350971",
+                "37dfaceef6f84f3d80350971",
+                "37dfaceef6f84f3d80350971",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "88ed5c92947743458b984aa5"
+        },
+        {
+            "NOME": "0012 2 a 4 DAS 08:00 AS 14:00:20 e QUI A SEX 09 AS 12",
+            "DESC_ESCALA": "0012 2 a 4 DAS 08:00 AS 14:00:20 e QUI A SEX 09 AS 12",
+            "COD": "11",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "a169b4dbef734319a71e3b05"
+        },
+        {
+            "NOME": "0013 SEG A SAB DAS 13:40 AS 20:00",
+            "DESC_ESCALA": "0013 SEG A SAB DAS 13:40 AS 20:00",
+            "COD": "12",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "42aeb47aadcb41728572f0e6",
+                "42aeb47aadcb41728572f0e6",
+                "42aeb47aadcb41728572f0e6",
+                "42aeb47aadcb41728572f0e6",
+                "42aeb47aadcb41728572f0e6",
+                "42aeb47aadcb41728572f0e6",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "d455e01e74ba4c6dad9533c8"
+        },
+        {
+            "NOME": "0014 SEG A SAB DAS 15:40 AS 22:00",
+            "DESC_ESCALA": "0014 SEG A SAB DAS 15:40 AS 22:00",
+            "COD": "13",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "6a51cf4eb51f4092a41bf812",
+                "6a51cf4eb51f4092a41bf812",
+                "6a51cf4eb51f4092a41bf812",
+                "6a51cf4eb51f4092a41bf812",
+                "6a51cf4eb51f4092a41bf812",
+                "6a51cf4eb51f4092a41bf812",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "9634164118bb4d20ad335a52"
+        },
+        {
+            "NOME": "0015 SEG A QUI 06:00 AS 16:00 SEX 06:00 AS 15:00",
+            "DESC_ESCALA": "0015 SEG A QUI 06:00 AS 16:00 SEX 06:00 AS 15:00",
+            "COD": "14",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "93e9491104f74eca8d19fc32",
+                "93e9491104f74eca8d19fc32",
+                "93e9491104f74eca8d19fc32",
+                "93e9491104f74eca8d19fc32",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "82df780af55c4b95a85de816"
+        },
+        {
+            "NOME": "0016PA SEG A SEX 07:00 AS 17:00",
+            "DESC_ESCALA": "0016PA SEG A SEX 07:00 AS 17:00",
+            "COD": "15",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "8a0465382bb14e25b3283cc1",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "8a0465382bb14e25b3283cc1",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "97ff1e0b73be4e2d8e8f241c"
+        },
+        {
+            "NOME": "0017 SEG A SEX DAS 14:00 AS 22:00",
+            "DESC_ESCALA": "0017 SEG A SEX DAS 14:00 AS 22:00",
+            "COD": "16",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "73d3d58daa7648ec85579f10",
+                "73d3d58daa7648ec85579f10",
+                "73d3d58daa7648ec85579f10",
+                "73d3d58daa7648ec85579f10",
+                "73d3d58daa7648ec85579f10",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "694f211954d54e56be923962"
+        },
+        {
+            "NOME": "0018PA SEG A SEX DAS 22:00 AS 06:00",
+            "DESC_ESCALA": "0018PA SEG A SEX DAS 22:00 AS 06:00",
+            "COD": "17",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "988ced7bef024050bd3ee80f",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "988ced7bef024050bd3ee80f",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "5a408dbb2df943a3b7f221cb"
+        },
+        {
+            "NOME": "0019PA SEG A SEX NOTURNO 22:00 AS 06:00",
+            "DESC_ESCALA": "0019PA SEG A SEX NOTURNO 22:00 AS 06:00",
+            "COD": "18",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "988ced7bef024050bd3ee80f",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "ID_FOLGA",
+                "988ced7bef024050bd3ee80f",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "731de2b3c6c143b19a014a0d"
+        },
+        {
+            "NOME": "0020 SEG A SEX DAS 09:00 AS 16:00",
+            "DESC_ESCALA": "0020 SEG A SEX DAS 09:00 AS 16:00",
+            "COD": "19",
+            "carga_horaria": "0",
+            "tipo_escala": "",
+            "TIPO": "SEMANAL",
+            "JORNADAS": [
+                "870f85c8a65b4f9a8cfe41aa",
+                "870f85c8a65b4f9a8cfe41aa",
+                "870f85c8a65b4f9a8cfe41aa",
+                "870f85c8a65b4f9a8cfe41aa",
+                "870f85c8a65b4f9a8cfe41aa",
+                "ID_FOLGA",
+                "ID_DSR"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "TIPO_HORA_ADICIONAL": "",
+            "TIPO_HORA_ADICIONAL_NOTURNO": "",
+            "COD_ADICIONAL_NOTURNO": "",
+            "excedente_apuracao_semanal": "",
+            "deficit_apuracao_semanal": "",
+            "excedente_apuracao_mensal": "",
+            "deficit_apuracao_mensal": "",
+            "key": "ad5d9ee096444b6382fbed86"
+        }
+    ],
+    "jornadas": [
+        {
+            "NOME_JORNADA": "08:00 AS 17:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "08:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0800",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "3edd5d3a4c534d1ea57152fd",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "DSR",
+            "DESC_JORNADA": "Descanso Semanal Remunerado",
+            "HORAS_CONTRATUAIS": [],
+            "PERIODOS": [],
+            "key": "ID_DSR"
+        },
+        {
+            "NOME_JORNADA": "FOLGA",
+            "DESC_JORNADA": "Dia de Folga",
+            "HORAS_CONTRATUAIS": [],
+            "PERIODOS": [],
+            "key": "ID_FOLGA"
+        },
+        {
+            "NOME_JORNADA": "08:00 AS 17:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "08:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0800",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "8ee89f11cbb84c4fae5bf0bc",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "08:00 AS 12:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "08:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0800",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "72f62545aa834600a2d4f7de",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "11:00 AS 20:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "11:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1100",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "7bd4b9b2c9d549b7bfdcdf3c",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "07:00 AS 19:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "07:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0700",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "f1ef0c4b9f0f450db29b5990",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "12:00 AS 21:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "12:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1200",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "e6052b1300c34d5aac9c157a",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "07:00 AS 17:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "07:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0700",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "8a0465382bb14e25b3283cc1",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "07:00 AS 16:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "07:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0700",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "6ea19116955d4747b2d29289",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "10:00 AS 19:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "10:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1000",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "dda06d93a3cb438a99997002",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "09:00 AS 18:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "09:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0900",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "37dfaceef6f84f3d80350971",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "13:40 AS 20:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "13:40"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1340",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "42aeb47aadcb41728572f0e6",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "15:40 AS 22:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "15:40"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1540",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "6a51cf4eb51f4092a41bf812",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "06:00 AS 15:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "06:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0600",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "93e9491104f74eca8d19fc32",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "14:00 AS 22:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "14:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "1400",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "73d3d58daa7648ec85579f10",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "22:00 AS 06:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "22:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "2200",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "988ced7bef024050bd3ee80f",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        },
+        {
+            "NOME_JORNADA": "09:00 AS 16:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "09:00"
+            ],
+            "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+            "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+            "FL_HORA_COMPENSAVEL": "1",
+            "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+            "FL_FATOR_POSTERIOR": "1",
+            "FL_TRATAMENTO_CARGA_INFERIOR": "FALTA",
+            "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Extra 50%",
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0900",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "870f85c8a65b4f9a8cfe41aa",
+            "HORAS_CONTRATUAIS_INTERVALO_EXTRA": [
+                "",
+                ""
+            ]
+        }
+    ],
+    "horas_adicionais": []
+}
