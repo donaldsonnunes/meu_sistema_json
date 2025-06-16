@@ -1,0 +1,66 @@
+{
+    "escalas": [
+        {
+            "NOME": "0006PA 12X36 DIURNO",
+            "DESC_ESCALA": "0006PA 12X36 DIURNO",
+            "COD": "5",
+            "carga_horaria": "0",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "0393e6bea7644beca9f71dd3b86ded2d",
+                "ID_FOLGA"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "key": "d1d5a497dddb45829010310e1ad5062b"
+        },
+        {
+            "NOME": "0007PA 12X36 NOTURNO",
+            "DESC_ESCALA": "0007PA 12X36 NOTURNO",
+            "COD": "6",
+            "carga_horaria": "0",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "0393e6bea7644beca9f71dd3b86ded2d",
+                "ID_FOLGA"
+            ],
+            "dsr": {
+                "ativo": "1",
+                "dia_completo": "1",
+                "desconto_valor_falta": "1",
+                "apuracao": {
+                    "semanal": "1"
+                }
+            },
+            "key": "17baeaee887c491792dbad97a66c591e"
+        }
+    ],
+    "jornadas": {
+        "ID_DSR": {
+            "NOME_JORNADA": "DSR",
+            "FL_DSR": "1",
+            "key": "ID_DSR",
+            "PERIODOS": []
+        },
+        "ID_FOLGA": {
+            "NOME_JORNADA": "FOLGA",
+            "key": "ID_FOLGA",
+            "PERIODOS": []
+        },
+        "0393e6bea7644beca9f71dd3b86ded2d": {
+            "NOME_JORNADA": "07:00AS19:00",
+            "HORAS_CONTRATUAIS": [],
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": false,
+            "batida_automatica": [],
+            "PERIODOS": [],
+            "key": "0393e6bea7644beca9f71dd3b86ded2d"
+        }
+    },
+    "horas_adicionais": []
+}
