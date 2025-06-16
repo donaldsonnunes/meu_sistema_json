@@ -67,86 +67,109 @@ def salvar_no_banco(conexao, dados_json, nome=None, selected_id=None):
 # DEFINIÇÃO DE CADA PÁGINA DA APLICAÇÃO
 # =====================================================================================
 
+# Substitua a função de documentação existente em app.py por esta
+
 def pagina_documentacao():
-    st.header("📄 Documentação dos Recursos")
-    st.markdown("Bem-vindo à Central de Comando de Administração Pessoal. Abaixo estão descritos os recursos disponíveis no menu lateral.")
+    st.header("📄 Documentação da Gestão de Escalas")
+    st.markdown("Bem-vindo! Esta ferramenta foi desenvolvida para processar, gerenciar e otimizar escalas de trabalho de forma inteligente. Abaixo estão descritos os recursos disponíveis no menu lateral.")
     
     st.divider()
+    # =======================================================================
+    st.subheader("Visão Geral e Gestão")
+    # =======================================================================
 
     with st.container(border=True):
-        st.subheader("📥 Importar Escala")
+        st.markdown("##### 📊 Dashboard")
         st.write("""
-        **O que faz:** Permite carregar um arquivo JSON de escalas (gerado externamente ou por esta própria ferramenta) e salvá-lo no banco de dados interno da aplicação.
+        **O que faz:** É a página inicial da aplicação. Oferece um resumo quantitativo dos seus dados, mostrando o total de arquivos, escalas e jornadas no sistema. Também exibe uma lista de todos os arquivos salvos para acesso rápido.
+        """)
+
+    with st.container(border=True):
+        st.markdown("##### 📥 Importar Escala")
+        st.write("""
+        **O que faz:** Permite carregar um arquivo de escalas no formato `.json` (gerado externamente ou por esta própria ferramenta) e salvá-lo no banco de dados interno da aplicação.
         
         **Como usar:**
-        1.  Clique no botão **"Procurar arquivos"**.
-        2.  Selecione um arquivo `.json` do seu computador.
-        3.  Clique no botão **"Importar Arquivo Agora"**.
+        1. Clique no botão **"Procurar arquivos"**.
+        2. Selecione um arquivo `.json` do seu computador.
+        3. Clique no botão **"Importar Arquivo Agora"**.
         """)
-
+    
     with st.container(border=True):
-        st.subheader("📝 Edição em Lote")
+        st.markdown("##### 🧩 Exportar JSON Personalizado")
         st.write("""
-        **O que faz:** Ferramenta poderosa para criar novas escalas em lote. Ela busca por escalas que contenham um texto específico (prefixo) em uma tag e cria cópias dessas escalas, substituindo o prefixo pelo novo valor.
+        **O que faz:** Permite selecionar um arquivo JSON do banco de dados e escolher escalas específicas dentro dele para gerar um novo arquivo `.json` contendo apenas os dados selecionados.
         
         **Como usar:**
-        1.  **Passo 1:** Selecione o arquivo JSON que deseja usar como base.
-        2.  **Passo 2:** Defina a regra de edição:
-            - **Selecione a Tag:** Escolha a tag onde a busca será feita (ex: "NOME" ou "COD").
-            - **Texto a ser localizado:** Digite o prefixo que você quer encontrar.
-            - **Substituir o prefixo por:** Digite o novo texto que substituirá o prefixo.
-        3.  Clique em **"Pré-visualizar alterações"** para ver uma tabela com as mudanças propostas.
-        4.  **Passo 3:** Escolha como salvar:
-            - **Opção 1 (Salvar Tudo):** Adiciona as novas escalas ao arquivo original, podendo sobrescrevê-lo ou salvar como um novo arquivo.
-            - **Opção 2 (Salvar Somente Novas):** Cria um arquivo novo contendo apenas as escalas geradas no lote.
+        1. Selecione um **Arquivo de origem** na lista.
+        2. Na caixa **"Selecione as escalas"**, clique para ver a lista e marque uma ou mais escalas que deseja exportar.
+        3. Clique em **"Gerar e Baixar JSON"** para que o botão de download apareça.
         """)
 
     with st.container(border=True):
-        st.subheader("🧩 Exportar JSON Personalizado")
+        st.markdown("##### 📁 Exportar Lista de Arquivos e Escalas")
         st.write("""
-        **O que faz:** Permite selecionar um arquivo JSON do banco de dados e escolher escalas específicas dentro dele para gerar um novo arquivo JSON contendo apenas os dados selecionados.
-        
-        **Como usar:**
-        1.  Selecione um **Arquivo de origem** na lista.
-        2.  Na caixa **"Selecione as escalas"**, clique para ver a lista e selecione uma ou mais escalas que deseja exportar.
-        3.  Clique em **"Gerar e Baixar JSON"**.
-        4.  O botão **"Baixar JSON Personalizado"** aparecerá para download.
+        **O que faz:** Gera uma tabela com duas colunas ("Arquivo" e "Escala"), listando todas as escalas contidas em todos os arquivos do banco de dados. Permite baixar esta lista como um arquivo `.csv`.
         """)
         
     with st.container(border=True):
-        st.subheader("🔎 Duplicar para coligadas/filiais")
-        st.write("""
-        **O que faz:** Similar à "Edição em Lote", esta ferramenta é otimizada para o cenário de duplicação de escalas para novas filiais ou coligadas, alterando um prefixo em uma tag específica. A funcionalidade é idêntica à Edição em Lote.
-        """)
-
-    with st.container(border=True):
-        st.subheader("📊 Gerar escalas através de CSV")
-        st.write("""
-        **O que faz:** O recurso principal de processamento. Converte um arquivo `.csv` ou `.xlsx` com descrições textuais de escalas em um arquivo JSON totalmente estruturado e pronto para uso.
-        
-        **Como usar:**
-        1.  Clique em **"Procurar arquivos"** e selecione seu arquivo de planilhas.
-        2.  Clique no botão **"Processar Escalas"**.
-        3.  Aguarde o processamento e veja a pré-visualização, o botão de download e o conteúdo do JSON gerado.
-        """)
-
-    with st.container(border=True):
-        st.subheader("🗑️ Excluir Arquivo")
+        st.markdown("##### 🗑️ Excluir Arquivo")
         st.write("""
         **O que faz:** Remove permanentemente um arquivo JSON do banco de dados da aplicação.
         
         **Como usar:**
-        1.  Selecione o arquivo que deseja remover na caixa de seleção.
-        2.  Leia o aviso de confirmação.
-        3.  Clique no botão **"Confirmar Exclusão"**.
+        1. Selecione o arquivo que deseja remover na caixa de seleção.
+        2. Leia o aviso de confirmação e clique no botão **"Confirmar Exclusão"**.
+        """)
+
+    st.divider()
+    # =======================================================================
+    st.subheader("Criação e Processamento")
+    # =======================================================================
+
+    with st.container(border=True):
+        st.markdown("##### 📊 Gerar escalas através de CSV")
+        st.write("""
+        **O que faz:** O recurso principal da aplicação. Converte um arquivo `.csv` ou `.xlsx` com descrições textuais de escalas em um arquivo JSON totalmente estruturado e otimizado.
+        
+        **Funcionalidades Inteligentes:**
+        - **Unificação Automática:** Identifica escalas que são funcionalmente idênticas (mesmos horários e dias), mesmo que escritas de forma diferente, e as unifica para evitar duplicatas.
+        - **Geração de Log:** Ao final do processamento, se alguma escala foi unificada, um botão aparecerá para baixar um arquivo `.txt` com o **"Log de Unificações"**, detalhando exatamente quais escalas foram agrupadas.
+        """)
+
+    st.divider()
+    # =======================================================================
+    st.subheader("Edição e Manutenção")
+    # =======================================================================
+
+    with st.container(border=True):
+        st.markdown("##### ✏️ Editor Visual")
+        st.write("""
+        **O que faz:** Permite editar os detalhes de uma **escala individual** de forma visual e intuitiva.
+        
+        **Como usar:**
+        1.  **Passo 1:** Selecione o arquivo JSON que contém a escala.
+        2.  **Passo 2:** Selecione a escala específica que deseja modificar.
+        3.  Um formulário aparecerá, permitindo alterar o Nome, Código, e o mais importante: **trocar a jornada de cada dia da semana** usando um menu de seleção.
+        4.  Clique em "Salvar Alterações" para atualizar a escala.
         """)
         
     with st.container(border=True):
-        st.subheader("📁 Exportar Lista de Arquivos e Escalas")
+        st.markdown("##### 📕 Editor de Jornadas")
         st.write("""
-        **O que faz:** Gera uma tabela com duas colunas ("Arquivo" e "Escala"), listando todas as escalas contidas em todos os arquivos do banco de dados. Permite baixar esta lista como um arquivo `.csv`.
+        **O que faz:** Permite gerenciar as "peças" que compõem as escalas: as jornadas de trabalho.
+        
+        **Como usar:**
+        1.  Selecione uma jornada da lista (ex: "08:00 AS 18:00").
+        2.  Um formulário de edição permitirá alterar o nome da jornada e os **horários exatos** de entrada, saída e intervalo.
+        3.  Ao salvar, o sistema **atualiza esta jornada em todos os arquivos e escalas que a utilizam**, garantindo consistência total.
         """)
-# Adicione esta nova função em app.py
+
+    with st.container(border=True):
+        st.markdown("##### 📝 Edição em Lote / Duplicar para coligadas")
+        st.write("""
+        **O que faz:** Ferramentas para criar novas escalas em lote, buscando por um texto específico (prefixo) em uma tag e o substituindo por um novo valor. Ideal para criar cópias de um conjunto de escalas para uma nova filial ou centro de custo.
+        """)
 
 def pagina_dashboard():
     st.header("📊 Dashboard de Controle")
@@ -862,30 +885,30 @@ def pagina_editor_jornadas():
 # LÓGICA PRINCIPAL DA APLICAÇÃO (MENU E ROTEAMENTO)
 # =====================================================================================
 
-def main():
-# Dentro da função main() em app.py
+# Substitua toda a sua função main() em app.py por esta versão final
 
-    # Dicionário de páginas atualizado
+def main():
+    """Função principal que organiza a UI e o roteamento."""
+    st.sidebar.title("⚙️ Menu")
+
     PAGES = {
-        "📊 Dashboard": pagina_dashboard, # Adicionado como primeira opção
-        "📄 Documentação Recursos": pagina_documentacao,
-        "📥 Importar Escala": pagina_importar_escala,
-        "📝 Edição em Lote": pagina_edicao_em_lote,
-        "🧩 Exportar JSON Personalizado": pagina_exportar_json_personalizado,
-        "🔎 Duplicar para coligadas/filiais": pagina_duplicar_para_coligadas,
+        "📊 Dashboard": pagina_dashboard,
+        "✏️ Editor Visual": pagina_editor_visual,
+        "📕 Editor de Jornadas": pagina_editor_jornadas,
         "📊 Gerar escalas através de CSV": pagina_gerar_escalas_csv,
-        "✏️ Editor Visual": pagina_editor_visual, # Adicionada nova página de edição
-        "📕 Editor de Jornadas": pagina_editor_jornadas, # Adicionada nova página
-        "🗑️ Excluir Arquivo": pagina_excluir_arquivo,
+        "📝 Edição em Lote": pagina_edicao_em_lote,
+        "🔎 Duplicar para coligadas/filiais": pagina_duplicar_para_coligadas,
+        "📥 Importar Escala": pagina_importar_escala,
+        "🧩 Exportar JSON Personalizado": pagina_exportar_json_personalizado,
         "📁 Exportar Lista de Arquivos e Escalas": pagina_exportar_lista,
+        "🗑️ Excluir Arquivo": pagina_excluir_arquivo,
+        "📄 Documentação Recursos": pagina_documentacao,
     }
 
     selection = st.sidebar.radio("Escolha uma opção:", list(PAGES.keys()), key="main_menu")
 
-    # O resto da função permanece igual...
     # Chama a função da página selecionada
     page_function = PAGES[selection]
     page_function()
-
 if __name__ == "__main__":
     main()
