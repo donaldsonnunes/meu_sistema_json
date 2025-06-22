@@ -11,7 +11,7 @@ import time
 from datetime import datetime, time as dt_time
 
 # --- Configuração da Página ---
-st.set_page_config(page_title="Central de ADM Pessoal", page_icon="⚙️", layout="wide")
+st.set_page_config(page_title="Central de Gestão de Escalas", page_icon="⚙️", layout="wide")
 
 # --- Conexão com o Banco de Dados (Cacheado) ---
 @st.cache_resource
