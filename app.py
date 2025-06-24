@@ -1,4 +1,4 @@
-# app.py (Versão Final e Consolidada)
+# app.py (Versão Final com Lógica de Exportação Corrigida)
 
 import streamlit as st
 import sqlite3
@@ -8,7 +8,7 @@ import os
 import copy
 import uuid
 import time
-from datetime import datetime, time as dt_time
+from datetime import datetime
 
 # --- Configuração da Página ---
 st.set_page_config(page_title="Central de Gestão de Escalas", page_icon="⚙️", layout="wide")
@@ -174,33 +174,78 @@ def pagina_traduzir_csv_com_regras(conn):
 def pagina_gerar_escalas_csv(conn):
     st.header("📊 Gerar Escalas por CSV")
     st.info("Carregue um arquivo com descrições JÁ PADRONIZADAS para convertê-lo em um arquivo JSON.")
-    try: from processador import process_file
-    except ImportError: st.error("Arquivo 'processador.py' não encontrado."); return
+    try:
+        from processador import process_file
+    except ImportError:
+        st.error("Arquivo 'processador.py' não encontrado."); return
+
     uploaded_file = st.file_uploader("Selecione .csv ou .xlsx", type=["csv", "xlsx"], key="gen_csv_uploader")
-    if uploaded_file and st.button("🚀 Processar Escalas", use_container_width=True, type="primary"):
-        with st.spinner('Processando...'):
-            try:
-                df = pd.read_excel(uploaded_file) if uploaded_file.name.endswith(".xlsx") else pd.read_csv(uploaded_file, sep=None, engine='python')
-                timestamp, base_filename = datetime.now().strftime("%Y%m%d_%H%M%S"), os.path.splitext(uploaded_file.name)[0]
-                output_filename, log_filename = f"resultado_{base_filename}_{timestamp}.json", f"log_unificacoes_{base_filename}_{timestamp}.txt"
-                output_dir = "output"; os.makedirs(output_dir, exist_ok=True)
-                output_path = os.path.join(output_dir, output_filename)
-                processed_data, log_unificacao = process_file(df, output_path)
-                st.session_state.gen_output_path, st.session_state.gen_log_unificacao, st.session_state.gen_log_filename = output_path, log_unificacao, log_filename
-                st.success("✅ Processamento concluído!")
-            except Exception as e: st.error(f"❌ Erro: {e}")
+
+    if uploaded_file:
+        df = None
+        try:
+            if uploaded_file.name.endswith('.xlsx'):
+                df = pd.read_excel(uploaded_file, engine='openpyxl')
+            else:
+                configs_para_tentar = [{'encoding': 'latin-1', 'sep': ';'}, {'encoding': 'latin-1', 'sep': ','}, {'encoding': 'utf-8', 'sep': ';'}, {'encoding': 'utf-8', 'sep': ','}]
+                for config in configs_para_tentar:
+                    try:
+                        uploaded_file.seek(0)
+                        df_tentativa = pd.read_csv(uploaded_file, engine='python', **config)
+                        if df_tentativa.shape[1] > 0:
+                            df = df_tentativa
+                            break
+                    except Exception:
+                        continue
+            
+            if df is None:
+                st.error("Não foi possível ler o arquivo. Verifique o formato e a codificação."); return
+
+            df = df.drop(columns=[col for col in df.columns if 'Unnamed:' in str(col)], errors='ignore')
+            st.subheader("Pré-visualização do Arquivo Carregado")
+            st.dataframe(df.head())
+
+            if st.button("🚀 Processar Escalas", use_container_width=True, type="primary"):
+                with st.spinner('Processando...'):
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    base_filename = os.path.splitext(uploaded_file.name)[0]
+                    output_filename = f"resultado_{base_filename}_{timestamp}.json"
+                    log_filename = f"log_unificacoes_{base_filename}_{timestamp}.txt"
+                    
+                    output_dir = "output"
+                    os.makedirs(output_dir, exist_ok=True)
+                    output_path = os.path.join(output_dir, output_filename)
+                    
+                    processed_data, log_unificacao = process_file(df, output_path)
+                    
+                    st.session_state.processed_data_for_save = processed_data
+                    st.session_state.gen_output_path = output_path
+                    st.session_state.gen_log_unificacao = log_unificacao
+                    st.session_state.gen_log_filename = log_filename
+                    st.success("✅ Processamento concluído!")
+                    
+        except Exception as e:
+            st.error(f"❌ Erro ao processar o arquivo: {e}")
+
     if 'gen_output_path' in st.session_state:
+        st.divider()
+        st.subheader("Salvar e Baixar Resultados")
+        
+        with st.form("form_salvar_gerado"):
+            nome_arquivo = st.text_input("Nome para salvar no banco de dados:", value=os.path.basename(st.session_state.gen_output_path))
+            submitted = st.form_submit_button("Salvar no Banco")
+            if submitted:
+                if salvar_no_banco(conn, st.session_state.processed_data_for_save, nome=nome_arquivo):
+                    st.success(f"Arquivo '{nome_arquivo}' salvo no banco de dados!")
+
         col1, col2 = st.columns(2)
         with col1:
-            st.subheader("⬇️ Download do Resultado JSON")
             with open(st.session_state.gen_output_path, "rb") as f:
-                st.download_button(label=f"📥 Baixar {os.path.basename(st.session_state.gen_output_path)}", data=f, file_name=os.path.basename(st.session_state.gen_output_path), mime="application/json", use_container_width=True)
+                st.download_button(label=f"📥 Baixar JSON Gerado", data=f, file_name=os.path.basename(st.session_state.gen_output_path), mime="application/json", use_container_width=True)
         with col2:
-            st.subheader("📋 Relatório de Unificação")
             if st.session_state.gen_log_unificacao:
                 log_data = "\n".join(st.session_state.gen_log_unificacao)
                 st.download_button(label=f"📋 Baixar Log de Unificações", data=log_data.encode('utf-8'), file_name=st.session_state.gen_log_filename, mime="text/plain", use_container_width=True)
-            else: st.success("Nenhuma escala duplicada foi encontrada.")
 
 def _pagina_edicao_em_massa(conn, titulo_pagina, chave_sufixo, formato_novo_nome, sufixo_arquivo_novo):
     st.header(titulo_pagina)
@@ -258,38 +303,81 @@ def pagina_duplicar_para_coligadas(conn):
     _pagina_edicao_em_massa(conn, "🔎 Duplicar para Coligadas/Filiais", "dup", "{nome_antigo} (Cópia: {valor_substituir})", "duplicado")
 
 def pagina_importar_escala(conn):
-    st.header("📥 Importar Escala JSON")
-    uploaded_file = st.file_uploader("Escolha um arquivo .json", type="json")
+    st.header("📥 Importar Arquivo JSON")
+    uploaded_file = st.file_uploader("Escolha um arquivo .json", type="json", key="import_json_uploader")
     if uploaded_file:
         try:
-            data = json.load(uploaded_file)
-            st.success("Arquivo pré-visualizado. Clique abaixo para salvar."); st.json(data, expanded=False)
-            if st.button("Salvar no Banco de Dados", type="primary"):
-                if salvar_no_banco(conn, data, nome=uploaded_file.name): st.success(f"Arquivo '{uploaded_file.name}' salvo!"); st.rerun()
-        except Exception as e: st.error(f"Ocorreu um erro: {e}")
+            file_key = f"data_json_{uploaded_file.name}"
+            if file_key not in st.session_state:
+                st.session_state[file_key] = json.load(uploaded_file)
+            data = st.session_state[file_key]
+            st.success("Arquivo pré-visualizado. Clique abaixo para salvar.")
+            st.json(data, expanded=False)
+            with st.form(key='save_json_form'):
+                nome_arquivo_sugerido = uploaded_file.name
+                nome_arquivo_final = st.text_input("Nome para salvar no banco de dados:", value=nome_arquivo_sugerido)
+                submitted = st.form_submit_button("Salvar no Banco de Dados")
+                if submitted:
+                    if salvar_no_banco(conn, data, nome=nome_arquivo_final):
+                        st.success(f"Arquivo '{nome_arquivo_final}' salvo!")
+                        for key in list(st.session_state.keys()):
+                            if key.startswith('data_json_'):
+                                del st.session_state[key]
+                        time.sleep(1)
+                        st.rerun()
+        except json.JSONDecodeError:
+            st.error("Erro: O arquivo não é um JSON válido. Verifique o conteúdo do arquivo.")
+        except Exception as e:
+            st.error(f"Ocorreu um erro inesperado: {e}")
 
 def pagina_exportar_json_personalizado(conn):
     st.header("🧩 Exportar JSON Personalizado")
     cursor = conn.cursor()
     files = cursor.execute("SELECT id, name FROM jsons ORDER BY name").fetchall()
-    if not files: st.warning("Nenhum arquivo JSON disponível."); return
+    if not files:
+        st.warning("Nenhum arquivo JSON disponível."); return
+
     options_files = {f['id']: f['name'] for f in files}
     selected_file_id = st.selectbox("1. Arquivo de origem:", options_files.keys(), format_func=lambda id: options_files.get(id), index=None, placeholder="Escolha um arquivo...")
+
     if selected_file_id:
         json_data = json.loads(cursor.execute("SELECT data FROM jsons WHERE id = ?", (selected_file_id,)).fetchone()['data'])
-        scale_options = {s.get("key"): s.get("NOME") for s in json_data.get("escalas", [])}
+        escalas_disponiveis = json_data.get("escalas", [])
+        
+        scale_options = {s.get("key"): s.get("NOME", "Escala sem nome") for s in escalas_disponiveis if s.get("key")}
+        
         select_all = st.checkbox("Selecionar todas as escalas", value=False)
         default_selection = list(scale_options.keys()) if select_all else []
-        selected_keys = st.multiselect("2. Selecione as escalas:", options=scale_options.keys(), format_func=lambda k: scale_options.get(k), default=default_selection)
-        if selected_keys and st.button("Gerar JSON Personalizado", type="primary"):
-            escalas_selecionadas = [s for s in json_data.get("escalas", []) if s.get("key") in selected_keys]
-            jornadas_usadas = {j_key for esc in escalas_selecionadas for j_key in esc.get("JORNADAS", [])}
-            jornadas_filtradas = {k: v for k, v in json_data.get("jornadas", {}).items() if k in jornadas_usadas}
-            new_json = {"escalas": escalas_selecionadas, "jornadas": jornadas_filtradas, "horas_adicionais": json_data.get("horas_adicionais", [])}
+        
+        selected_keys = st.multiselect("2. Selecione as escalas:", options=scale_options.keys(), format_func=lambda k: scale_options.get(k, k), default=default_selection)
+        
+        if st.button("Gerar JSON Personalizado", type="primary", use_container_width=True):
+            if not selected_keys:
+                st.warning("Nenhuma escala selecionada."); st.stop()
+            
+            escalas_selecionadas = [s for s in escalas_disponiveis if s.get("key") in selected_keys]
+            
+            jornadas_usadas = set()
+            for esc in escalas_selecionadas:
+                jornadas_usadas.update(esc.get("JORNADAS", []))
+            
+            jornadas_originais = json_data.get("jornadas", {})
+            jornadas_filtradas = {key: value for key, value in jornadas_originais.items() if key in jornadas_usadas}
+
+            new_json = {
+                "escalas": escalas_selecionadas, 
+                "jornadas": jornadas_filtradas, 
+                "horas_adicionais": json_data.get("horas_adicionais", {})
+            }
+            
             st.session_state.export_data = json.dumps(new_json, indent=4, ensure_ascii=False)
             st.session_state.export_filename = f"personalizado_{options_files[selected_file_id]}"
-    if 'export_data' in st.session_state:
-        st.download_button("📥 Baixar JSON", st.session_state.export_data, st.session_state.export_filename, "application/json")
+            st.success("JSON personalizado gerado com sucesso!")
+
+    if 'export_data' in st.session_state and st.session_state.export_data:
+        st.subheader("⬇️ Download do Resultado")
+        st.download_button("📥 Baixar JSON", st.session_state.export_data, st.session_state.export_filename, "application/json", use_container_width=True)
+
 
 def pagina_exportar_lista(conn):
     st.header("📁 Exportar Lista de Escalas")
@@ -298,11 +386,18 @@ def pagina_exportar_lista(conn):
     data_list = []
     for row in rows:
         try:
-            for esc in json.loads(row['data']).get("escalas", []): data_list.append([row['name'], esc.get("NOME", "Sem nome")])
-        except: data_list.append([row['name'], "ERRO"])
+            escalas_data = json.loads(row['data']).get("escalas", [])
+            if isinstance(escalas_data, list):
+                for esc in escalas_data: 
+                    data_list.append([row['name'], esc.get("NOME", "Sem nome")])
+            else:
+                 data_list.append([row['name'], "ERRO DE FORMATO (escalas não é uma lista)"])
+        except Exception: 
+            data_list.append([row['name'], "ERRO AO LER JSON"])
     df = pd.DataFrame(data_list, columns=["Arquivo", "Escala"])
     st.dataframe(df, use_container_width=True, hide_index=True)
     st.download_button("📥 Baixar como CSV", df.to_csv(index=False, sep=';').encode('latin-1'), "lista_escalas.csv", "text/csv")
+
 
 def pagina_excluir_arquivo(conn):
     st.header("🗑️ Excluir Arquivo")
@@ -317,134 +412,38 @@ def pagina_excluir_arquivo(conn):
 
 def pagina_documentacao(conn):
     st.header("📄 Documentação dos Recursos")
-    # (Conteúdo completo da documentação que criamos anteriormente vai aqui)
-    st.markdown("Bem-vindo! Esta ferramenta foi desenvolvida para processar, gerenciar e otimizar escalas de trabalho de forma inteligente.")
+    st.markdown("""
+    Bem-vindo à **Central de Gestão de Escalas**! Esta ferramenta foi projetada para simplificar e automatizar a conversão de descrições de horários de trabalho em um formato estruturado (JSON), pronto para ser importado em outros sistemas.
 
-# Cole este bloco de código inteiro dentro do seu app.py
+    Abaixo, você encontrará uma descrição detalhada de cada funcionalidade disponível no menu lateral.
 
-def _pagina_edicao_em_massa(conn, titulo_pagina, chave_sufixo, formato_novo_nome, sufixo_arquivo_novo):
-    """
-    Função genérica e refatorada para lidar com duplicação e edição em lote.
-    """
-    st.header(titulo_pagina)
-    st.info("Esta ferramenta cria novas escalas em lote com base na substituição de um prefixo em uma tag específica.")
+    ### 📊 Dashboard
+    Esta é a página inicial. Ela oferece uma visão geral e rápida da sua base de dados.
     
-    cursor = conn.cursor()
-    rows = cursor.execute("SELECT id, name FROM jsons ORDER BY name").fetchall()
-    if not rows: st.warning("Nenhum arquivo no banco de dados."); return
+    ### ⚙️ Gerenciar Regras de Tradução
+    Este é o cérebro do sistema. Aqui você pode "ensinar" o aplicativo a entender os diferentes padrões de texto das suas planilhas.
+
+    ### 📄 Traduzir CSV com Regras
+    O primeiro passo do fluxo de trabalho. Carregue um CSV, selecione a coluna com as descrições e aplique as regras que criou.
+
+    ### 📊 Gerar Escalas por CSV
+    O segundo e principal passo do fluxo. Use o arquivo traduzido para gerar o JSON final no formato correto.
+
+    ### 📝 Edição em Lote e 🔎 Duplicar para Coligadas
+    Permitem fazer modificações em massa em um arquivo JSON já existente com base na substituição de prefixos.
     
-    options_list = {r["id"]: r["name"] for r in rows}
-    json_id = st.selectbox("1. Selecione o JSON de origem", options_list.keys(), format_func=lambda id: options_list.get(id), key=f"json_select_{chave_sufixo}", index=None, placeholder="Escolha um arquivo...")
+    ### 🧩 Exportar JSON Personalizado
+    Permite criar um arquivo JSON menor a partir de um arquivo grande já existente, selecionando apenas as escalas desejadas.
     
-    if json_id:
-        selected_name = options_list[json_id]
-        result = cursor.execute("SELECT data FROM jsons WHERE id=?", (json_id,)).fetchone()
-        if not result: st.error("Arquivo não encontrado."); return
-        
-        original_data = json.loads(result[0])
-        escalas = original_data.get('escalas', [])
-        if not escalas: st.warning("O arquivo não contém 'escalas'."); return
-        
-        todas_tags = sorted(list(set(key for esc in escalas for key in esc.keys())))
-        
-        with st.container(border=True):
-            st.markdown("##### 2. Defina a Regra de Substituição")
-            col1, col2, col3 = st.columns(3)
-            tag_selecionada = col1.selectbox("Buscar na Tag:", todas_tags, key=f"tag_{chave_sufixo}")
-            valor_localizar = col2.text_input("Texto a localizar (prefixo):", key=f"search_{chave_sufixo}")
-            valor_substituir = col3.text_input("Substituir prefixo por:", key=f"replace_{chave_sufixo}")
-        
-        if st.button("👁️ Pré-visualizar Alterações", use_container_width=True, key=f"preview_{chave_sufixo}"):
-            dados_preview, novas_escalas = [], []
-            if valor_localizar:
-                for esc in original_data.get("escalas", []):
-                    valor_original = esc.get(tag_selecionada)
-                    if isinstance(valor_original, str) and valor_original.startswith(valor_localizar):
-                        nova_escala = copy.deepcopy(esc)
-                        novo_valor = valor_substituir + valor_original[len(valor_localizar):]
-                        nova_escala[tag_selecionada] = novo_valor
-                        novo_nome = formato_novo_nome.format(nome_antigo=nova_escala.get("NOME", ""), valor_substituir=valor_substituir)
-                        nova_escala["NOME"], nova_escala["key"] = novo_nome, uuid.uuid4().hex
-                        novas_escalas.append(nova_escala)
-                        dados_preview.append({"Nome Original": esc.get("NOME"), "Novo Nome": novo_nome, f"Tag Original": valor_original, f"Tag Proposta": novo_valor})
-            
-            if dados_preview:
-                json_modificado = copy.deepcopy(original_data)
-                json_modificado["escalas"].extend(novas_escalas)
-                st.session_state[f'preview_{chave_sufixo}'] = pd.DataFrame(dados_preview)
-                st.session_state[f'json_mod_{chave_sufixo}'] = json_modificado
-            else:
-                st.warning("Nenhum registro encontrado com o critério especificado.")
-                if f'preview_{chave_sufixo}' in st.session_state: del st.session_state[f'preview_{chave_sufixo}']
-        
-        if f'preview_{chave_sufixo}' in st.session_state:
-            with st.container(border=True):
-                st.markdown("#### 3. Confirme e Salve")
-                st.dataframe(st.session_state[f'preview_{chave_sufixo}'], use_container_width=True)
-                
-                opcao = st.radio("Como deseja salvar?", ["Sobrescrever arquivo existente", "Salvar como novo arquivo"], key=f"save_opt_{chave_sufixo}", horizontal=True)
-                novo_nome_arquivo = ""
-                if opcao == "Salvar como novo arquivo":
-                    default_name = selected_name.replace(".json", f"_{sufixo_arquivo_novo}.json")
-                    novo_nome_arquivo = st.text_input("Nome do novo arquivo:", value=default_name, key=f"new_name_{chave_sufixo}")
-                
-                if st.button("Salvar Agora", key=f"save_btn_{chave_sufixo}", type="primary"):
-                    json_final = st.session_state[f'json_mod_{chave_sufixo}']
-                    id_salvar, nome_salvar = (json_id, selected_name) if opcao == "Sobrescrever arquivo existente" else (None, novo_nome_arquivo.strip())
-                    if not nome_salvar:
-                        st.error("Informe um nome para o novo arquivo.")
-                    elif salvar_no_banco(conn, json_final, nome=nome_salvar, selected_id=id_salvar):
-                        st.success("Arquivo salvo com sucesso!")
-                        for key in list(st.session_state.keys()):
-                            if chave_sufixo in key: del st.session_state[key]
-                        time.sleep(1)
-                        st.rerun()
+    ### 📥 Importar Arquivo JSON
+    Permite adicionar um arquivo JSON já formatado diretamente à base de dados.
 
-def pagina_duplicar_para_coligadas(conn):
-    _pagina_edicao_em_massa(
-        conn,
-        titulo_pagina="🔎 Duplicar para Coligadas/Filiais",
-        chave_sufixo="dup",
-        formato_novo_nome="{nome_antigo} (Cópia: {valor_substituir})",
-        sufixo_arquivo_novo="duplicado"
-    )
+    ### 📁 Exportar Lista de Escalas
+    Gera um CSV com a lista de todas as escalas em todos os arquivos.
 
-def pagina_exportar_json_personalizado(conn):
-    st.header("🧩 Exportar JSON Personalizado")
-    cursor = conn.cursor()
-    files = cursor.execute("SELECT id, name FROM jsons ORDER BY name").fetchall()
-    if not files: st.warning("Nenhum arquivo JSON disponível."); return
-
-    options_files = {f['id']: f['name'] for f in files}
-    selected_file_id = st.selectbox("1. Arquivo de origem:", options_files.keys(), format_func=lambda id: options_files.get(id), index=None, placeholder="Escolha um arquivo...")
-
-    if selected_file_id:
-        json_data = json.loads(cursor.execute("SELECT data FROM jsons WHERE id = ?", (selected_file_id,)).fetchone()['data'])
-        scale_options = {s.get("key"): s.get("NOME", "Sem nome") for s in json_data.get("escalas", []) if s.get("key")}
-        
-        select_all = st.checkbox("Selecionar todas as escalas", value=False)
-        default_selection = list(scale_options.keys()) if select_all else []
-        
-        selected_keys = st.multiselect("2. Selecione as escalas:", options=scale_options.keys(), format_func=lambda k: scale_options.get(k, k), default=default_selection)
-        
-        if st.button("Gerar JSON Personalizado", type="primary", use_container_width=True):
-            if not selected_keys:
-                st.warning("Nenhuma escala selecionada.")
-                st.stop()
-            
-            escalas_selecionadas = [s for s in json_data.get("escalas", []) if s.get("key") in selected_keys]
-            jornadas_usadas = {j_key for esc in escalas_selecionadas for j_key in esc.get("JORNADAS", [])}
-            jornadas_filtradas = {k: v for k, v in json_data.get("jornadas", {}).items() if k in jornadas_usadas}
-            
-            new_json = {"escalas": escalas_selecionadas, "jornadas": jornadas_filtradas, "horas_adicionais": json_data.get("horas_adicionais", [])}
-            
-            st.session_state.export_data = json.dumps(new_json, indent=4, ensure_ascii=False)
-            st.session_state.export_filename = f"personalizado_{options_files[selected_file_id]}"
-            
-    if 'export_data' in st.session_state and st.session_state.export_data:
-        st.subheader("⬇️ Download do Resultado")
-        st.download_button("📥 Baixar JSON", st.session_state.export_data, st.session_state.export_filename, "application/json", use_container_width=True)
-
+    ### 🗑️ Excluir Arquivo
+    Permite remover permanentemente um arquivo JSON da base de dados.
+    """)
 
 # ==============================================================================
 # FUNÇÃO PRINCIPAL (MAIN)
@@ -455,8 +454,6 @@ def main():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "📊 Dashboard"
 
-# Dentro da função main() em app.py
-
     PAGES = {
         "📊 Dashboard": pagina_dashboard,
         "--- TRADUÇÃO E CRIAÇÃO ---": None,
@@ -464,10 +461,11 @@ def main():
         "📄 Traduzir CSV com Regras": pagina_traduzir_csv_com_regras,
         "📊 Gerar Escalas por CSV": pagina_gerar_escalas_csv,
         "--- EDIÇÃO E GESTÃO ---": None,
-        "📝 Edição em Lote": pagina_edicao_em_lote, # RESTAURADO
-        "🔎 Duplicar para Coligadas": pagina_duplicar_para_coligadas, # RESTAURADO
-        "🧩 Exportar JSON Personalizado": pagina_exportar_json_personalizado, # RESTAURADO
+        "📝 Edição em Lote": pagina_edicao_em_lote, 
+        "🔎 Duplicar para Coligadas": pagina_duplicar_para_coligadas,
+        "🧩 Exportar JSON Personalizado": pagina_exportar_json_personalizado,
         "--- ARQUIVOS ---": None,
+        "📥 Importar Arquivo JSON": pagina_importar_escala,
         "📁 Exportar Lista de Escalas": pagina_exportar_lista,
         "🗑️ Excluir Arquivo": pagina_excluir_arquivo,
         "--- AJUDA ---": None,

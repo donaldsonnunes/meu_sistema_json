@@ -1,0 +1,34 @@
+{
+    "escalas": [],
+    "jornadas": {
+        "ID_FOLGA": {
+            "NOME_JORNADA": "FOLGA",
+            "key": "ID_FOLGA",
+            "sem_expediente": "1"
+        },
+        "ID_DSR": {
+            "NOME_JORNADA": "DSR",
+            "key": "ID_DSR",
+            "FL_DSR": "1",
+            "sem_expediente": "1"
+        }
+    },
+    "horas_adicionais": {
+        "Hora Extra 50%": {
+            "TIPO": "HE",
+            "VALOR": "50"
+        },
+        "Hora Extra 100%": {
+            "TIPO": "HE",
+            "VALOR": "100"
+        },
+        "Banco de Horas 50%": {
+            "TIPO": "BH",
+            "VALOR": "1"
+        },
+        "Banco de Horas 100%": {
+            "TIPO": "BH",
+            "VALOR": "1"
+        }
+    }
+}
