@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversor de Escalas V52 - Manual Stop Log</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .scroll-custom::-webkit-scrollbar { width: 6px; }
+        .scroll-custom::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-4 gap-6">
+        <aside class="lg:col-span-1 space-y-4">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                
+                <h2 class="text-[10px] font-black text-blue-400 uppercase border-b border-slate-700 pb-2">Tags de Escala (Nível 1)</h2>
+                <div class="space-y-3 text-[11px]">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Tipo de Escala</label>
+                        <select id="flagTipoEscala" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                            <option value="SEMANAL">SEMANAL</option>
+                            <option value="MENSAL">MENSAL</option>
+                            <option value="CICLICA">CICLICA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Carga Horária Semanal</label>
+                        <input type="text" id="flagCarga" value="44" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                    </div>
+                    <div class="flex items-start gap-2 pt-1">
+                        <input type="checkbox" id="flagForcarDSR" checked class="mt-1">
+                        <label for="flagForcarDSR" class="font-bold text-amber-400 leading-tight">DSR no último dia se jornada for 7x0</label>
+                    </div>
+                </div>
+
+                <h2 class="text-[10px] font-black text-emerald-400 uppercase border-b border-slate-700 pb-2 mt-4">Tags de Jornada (Nível 2)</h2>
+                <div class="space-y-3 text-[11px]">
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Hora Compensável?</label>
+                        <select id="flagCompensavel" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                            <option value="1">Sim (1)</option>
+                            <option value="0">Não (0)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Tolerância (HHMM)</label>
+                        <input type="text" id="flagTolerancia" value="0010" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Batidas Pares?</label>
+                        <select id="flagBatidasPares" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                            <option value="false">Não (false)</option>
+                            <option value="true">Sim (true)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-400 mb-1">Batida Automática (HH:MM)</label>
+                        <input type="text" id="flagBatidaAuto" placeholder="Ex: 12:00, 13:00" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-slate-200">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="lg:col-span-3 space-y-6">
+            <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl text-center">
+                <div id="uploadArea" class="border-2 border-dashed border-slate-600 rounded-2xl p-12 hover:border-blue-500 hover:bg-slate-700/50 transition-all cursor-pointer group">
+                    <input type="file" id="csvFile" accept=".csv" class="hidden">
+                    <div class="text-slate-300 font-black text-2xl uppercase italic group-hover:text-blue-400">Selecione o arquivo CSV origem</div>
+                    <p id="fileNameDisplay" class="text-sm text-blue-400 font-bold mt-2"></p>
+                </div>
+
+                <div id="progressSection" class="hidden mt-8 space-y-4 text-left">
+                    <div class="flex justify-between items-end">
+                        <div class="space-y-1">
+                            <span id="statusText" class="text-sm font-bold text-blue-400 uppercase animate-pulse">Aguardando Cota...</span>
+                            <button id="stopBtn" class="block text-[10px] mt-2 bg-red-600 text-white font-bold px-3 py-1 rounded hover:bg-red-700">PARAR E BAIXAR PARCIAL</button>
+                        </div>
+                        <span id="percentDisplay" class="text-4xl font-black text-white">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-6 rounded-full border border-slate-700 p-1">
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-black/50 rounded-2xl p-6 border border-slate-800 shadow-inner">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-3 flex justify-between tracking-widest italic">Monitor V52 - Quota Survival <span id="totalCounter" class="text-blue-500 font-mono">0 / 0</span></h3>
+                <div id="logArea" class="h-40 overflow-y-auto space-y-1 text-[10px] font-mono text-slate-400 scroll-custom italic"></div>
+            </div>
+
+            <div id="downloadSection" class="hidden flex justify-center pb-10">
+                <button id="downloadBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-20 py-6 rounded-full font-black shadow-2xl uppercase tracking-widest text-lg">
+                    Baixar JSON RH Oficial
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_KEY = "AIzaSyDcRzvpZp1Rr1eeUPGlDqLRxI_vDqzhlR8"
+        let isStopped = false;
+        let finalEscalas = [];
+        let finalJornadas = {};
+        let jorMap = {};
+        
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+        function generateKey() { return Array.from({length: 24}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join(''); }
+        function toHHMM(t) { return t.replace(/[^0-9]/g, '').padStart(4, '0'); }
+
+        function addLog(msg, isError = false) {
+            const area = document.getElementById('logArea');
+            area.innerHTML += `<div class="${isError ? 'text-red-400' : ''}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            area.scrollTop = area.scrollHeight;
+        }
+
+        async function callGemini(descriptions) {
+            const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+            const payload = {
+                contents: [{ parts: [{ text: `Return a JSON ARRAY. Objects: SEG, TER, QUA, QUI, SEX, SAB, DOM. Values: ["HH:MM", "HH:MM"] or "LIVRE". Input: ${descriptions.join(' | ')}` }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-goog-api-key': API_KEY },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 429) return "PAUSE";
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error?.message || "Erro API");
+                return JSON.parse(data.candidates[0].content.parts[0].text);
+            } catch (e) {
+                addLog(`Erro de Conexão: ${e.message}`, true);
+                return null;
+            }
+        }
+
+        function finishProcess(manualStop = false) {
+            if (manualStop) {
+                addLog("PARALISADO MANUALMENTE PELO USUÁRIO. GERANDO ARQUIVO PARCIAL...", true);
+            } else {
+                addLog("PROCESSAMENTO CONCLUÍDO COM SUCESSO.");
+            }
+            
+            finalJornadas["ID_FOLGA"] = { "NOME_JORNADA": "FOLGA", "id": "ID_FOLGA", "key": "ID_FOLGA" };
+            finalJornadas["ID_DSR"] = { "NOME_JORNADA": "DSR", "FL_DSR": "1", "id": "ID_DSR", "key": "ID_DSR" };
+            
+            const output = { "escalas": finalEscalas, "jornadas": finalJornadas };
+            const blob = new Blob([JSON.stringify(output, null, 4)], { type: 'application/json' });
+            
+            document.getElementById('statusText').textContent = manualStop ? "PARADO PELO USUÁRIO" : "CONCLUÍDO";
+            document.getElementById('downloadSection').classList.remove('hidden');
+            document.getElementById('downloadBtn').onclick = () => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = manualStop ? `parcial_rh_${finalEscalas.length}.json` : `importacao_rh_final.json`;
+                a.click();
+            };
+        }
+
+        document.getElementById('uploadArea').onclick = () => document.getElementById('csvFile').click();
+        document.getElementById('stopBtn').onclick = () => { isStopped = true; finishProcess(true); };
+
+        document.getElementById('csvFile').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            document.getElementById('fileNameDisplay').textContent = file.name;
+            document.getElementById('progressSection').classList.remove('hidden');
+            isStopped = false;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const rows = e.target.result.split('\n').filter(l => l.trim() !== '').slice(1);
+                const batchSize = 10;
+                
+                const conf = {
+                    tipo: document.getElementById('flagTipoEscala').value,
+                    carga: document.getElementById('flagCarga').value,
+                    dsrForcado: document.getElementById('flagForcarDSR').checked,
+                    comp: document.getElementById('flagCompensavel').value,
+                    tol: document.getElementById('flagTolerancia').value,
+                    pares: document.getElementById('flagBatidasPares').value === 'true',
+                    auto: document.getElementById('flagBatidaAuto').value ? document.getElementById('flagBatidaAuto').value.split(',').map(t => toHHMM(t.trim())) : []
+                };
+
+                addLog(`Iniciando análise de ${rows.length} escalas...`);
+
+                for (let i = 0; i < rows.length && !isStopped; i += batchSize) {
+                    const batchRaw = rows.slice(i, i + batchSize);
+                    const batchDescs = batchRaw.map(row => row.split(',')[2] || "S/ Desc");
+
+                    let aiResults = await callGemini(batchDescs);
+                    
+                    if (aiResults === "PAUSE") {
+                        addLog("Cota diária atingida. Pausando 30s para recuperação...", true);
+                        await delay(30000); i -= batchSize; continue;
+                    }
+
+                    if (aiResults) {
+                        const resArr = Array.isArray(aiResults) ? aiResults : [aiResults];
+                        resArr.forEach((res, idx) => {
+                            if (!batchRaw[idx]) return;
+                            const original = batchRaw[idx].split(',');
+                            const diasID = [], dias = ['SEG','TER','QUA','QUI','SEX','SAB','DOM'];
+                            
+                            if (conf.dsrForcado && !dias.some(d => res[d] === "LIVRE")) res['DOM'] = "LIVRE";
+                            const livres = dias.filter(d => res[d] === "LIVRE");
+
+                            dias.forEach((dia) => {
+                                const val = res[dia];
+                                if (val === "LIVRE") {
+                                    if (livres.length === 1) diasID.push("ID_DSR");
+                                    else if (livres.length === 2) diasID.push(dia === livres[1] ? "ID_DSR" : "ID_FOLGA");
+                                    else diasID.push(dia === livres[livres.length-1] ? "ID_DSR" : "ID_FOLGA");
+                                } else if (Array.isArray(val)) {
+                                    const hash = JSON.stringify(val);
+                                    if (!jorMap[hash]) {
+                                        const key = generateKey(); jorMap[hash] = key;
+                                        finalJornadas[key] = {
+                                            "NOME_JORNADA": val.join(' | '),
+                                            "HORAS_CONTRATUAIS": val,
+                                            "FL_HORA_COMPENSAVEL": conf.comp,
+                                            "TM_TOLERANCIA_CARGA_POSITIVA": conf.tol,
+                                            "PREASSINALA_SOMENTE_BATIDAS_PARES": conf.pares,
+                                            "batida_automatica": conf.auto,
+                                            "id": key, "key": key
+                                        };
+                                    }
+                                    diasID.push(jorMap[hash]);
+                                }
+                            });
+                            finalEscalas.push({
+                                "NOME": original[1]?.replace(/"/g, ''),
+                                "COD": original[0],
+                                "carga_horaria": conf.carga,
+                                "ignora_carga_horaria_e_tipo_funcionario": "ignora_carga_horaria_e_tipo_funcionario",
+                                "TIPO": conf.tipo,
+                                "JORNADAS": diasID,
+                                "key": generateKey()
+                            });
+                        });
+                        document.getElementById('progressBar').style.width = `${Math.min(Math.round(((i + batchSize) / rows.length) * 100), 100)}%`;
+                        document.getElementById('percentDisplay').textContent = `${Math.min(Math.round(((i + batchSize) / rows.length) * 100), 100)}%`;
+                        document.getElementById('totalCounter').textContent = `${finalEscalas.length}/${rows.length}`;
+                        addLog(`Lote processado. Total atual: ${finalEscalas.length}`);
+                    }
+                    await delay(4000);
+                }
+                if (!isStopped) finishProcess();
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

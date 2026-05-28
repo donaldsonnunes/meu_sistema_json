@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Status Report – TOTVS RH Orçamento</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f5f8fa;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    color: #005f9e;
+    text-align: center;
+  }
+  .container {
+    max-width: 1200px;
+    margin: auto;
+  }
+  .section {
+    background: #fff;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+  }
+  label {
+    font-weight: 600;
+    color: #005f9e;
+    display: block;
+    margin-top: 8px;
+  }
+  input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fafafa;
+  }
+  textarea {
+    height: 80px;
+  }
+  .status-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .status-btn {
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .status-btn:hover { transform: scale(1.2); }
+  .green { background: #c8f7c5; }
+  .yellow { background: #fff7b1; }
+  .red { background: #ffc9c9; }
+
+  .actions {
+    text-align: center;
+    margin-top: 20px;
+  }
+  button {
+    background: #005f9e;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    margin: 0 5px;
+  }
+  button:hover { background: #0070c0; }
+
+  #output {
+    white-space: pre-wrap;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-family: "Segoe UI", sans-serif;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Status Report – Projetos Pilotos TRHO</h1>
+
+  <div class="section">
+    <label>Mensagem Geral (fixa para todos os projetos)</label>
+    <textarea id="msgGeral" placeholder="Ex: As melhorias informadas ao cliente Moura são evoluções que podem impactar outros clientes..."></textarea>
+  </div>
+
+  <div id="projetos"></div>
+
+  <div class="actions">
+    <button onclick="gerarStatus()">Gerar Status</button>
+    <button onclick="copiarTexto()">Copiar</button>
+    <button onclick="salvarDados()">Salvar</button>
+    <button onclick="carregarDados()">Carregar</button>
+    <button onclick="limparTudo()">Limpar Tudo</button>
+  </div>
+
+  <div id="output"></div>
+</div>
+
+<script>
+const projetosContainer = document.getElementById('projetos');
+for (let i = 1; i <= 10; i++) {
+  projetosContainer.innerHTML += `
+  <div class="section" id="proj${i}">
+    <h3>Cliente ${i}</h3>
+    <label>Nome do Cliente</label>
+    <input id="cliente${i}" placeholder="Nome do cliente">
+
+    <label>Data de Início</label>
+    <input id="inicio${i}" type="date">
+
+    <label>Previsão de Go-Live</label>
+    <input id="golive${i}" type="date">
+
+    <label>Status Atual</label>
+    <div class="status-btns">
+      <button class="status-btn green" onclick="definirStatus(${i}, '🟢 No prazo')">🟢</button>
+      <button class="status-btn yellow" onclick="definirStatus(${i}, '🟡 Atenção / Atraso')">🟡</button>
+      <button class="status-btn red" onclick="definirStatus(${i}, '🔴 Crítico')">🔴</button>
+    </div>
+    <input id="status${i}" readonly placeholder="Selecione o status clicando em uma bolinha">
+
+    <label>Descrição do Status</label>
+    <textarea id="descricao${i}" placeholder="Situação atual do projeto"></textarea>
+
+    <label>Entregas Realizadas</label>
+    <textarea id="entregas${i}" placeholder="Listar entregas realizadas"></textarea>
+
+    <label>Próximos Passos</label>
+    <textarea id="proximos${i}" placeholder="Listar próximos passos"></textarea>
+  </div>`;
+}
+
+function definirStatus(id, valor) {
+  document.getElementById(`status${id}`).value = valor;
+}
+
+function gerarStatus() {
+  const msgGeral = document.getElementById('msgGeral').value.trim();
+  let saida = "📌 Resumo Executivo\n\nBoa Noite!\n\nStatus Report – Projetos Pilotos TRHO (TOTVS RH Orçamento):\n\n";
+
+  for (let i = 1; i <= 10; i++) {
+    const cliente = document.getElementById(`cliente${i}`).value.trim();
+    if (!cliente) continue;
+    const inicio = document.getElementById(`inicio${i}`).value;
+    const golive = document.getElementById(`golive${i}`).value;
+    const status = document.getElementById(`status${i}`).value;
+    const descricao = document.getElementById(`descricao${i}`).value.trim();
+    const entregas = document.getElementById(`entregas${i}`).value.trim();
+    const proximos = document.getElementById(`proximos${i}`).value.trim();
+
+    saida += `\nCliente: ${cliente}\nData de Início: ${inicio || 'Pendente'}\nPrevisão de Go-Live: ${golive || 'Pendente'}\n\n📊 Status Atual: ${status || '⚪ Não informado'}\n\n${descricao}\n\n✅ Entregas Realizadas\n${entregas}\n\n📅 Próximos Passos\n${proximos}\n\n${msgGeral ? msgGeral + "\n" : ""}\n`;
+  }
+
+  document.getElementById('output').textContent = saida.trim();
+}
+
+function copiarTexto() {
+  const texto = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(texto);
+  alert('Status copiado para área de transferência!');
+}
+
+function salvarDados() {
+  const data = { msgGeral: document.getElementById('msgGeral').value };
+  for (let i = 1; i <= 10; i++) {
+    data[`cliente${i}`] = document.getElementById(`cliente${i}`).value;
+    data[`inicio${i}`] = document.getElementById(`inicio${i}`).value;
+    data[`golive${i}`] = document.getElementById(`golive${i}`).value;
+    data[`status${i}`] = document.getElementById(`status${i}`).value;
+    data[`descricao${i}`] = document.getElementById(`descricao${i}`).value;
+    data[`entregas${i}`] = document.getElementById(`entregas${i}`).value;
+    data[`proximos${i}`] = document.getElementById(`proximos${i}`).value;
+  }
+  localStorage.setItem('statusTRHO', JSON.stringify(data));
+  alert('Dados salvos localmente!');
+}
+
+function carregarDados() {
+  const data = JSON.parse(localStorage.getItem('statusTRHO') || "{}");
+  if (!Object.keys(data).length) return alert("Nenhum status salvo!");
+  document.getElementById('msgGeral').value = data.msgGeral || "";
+  for (let i = 1; i <= 10; i++) {
+    document.getElementById(`cliente${i}`).value = data[`cliente${i}`] || "";
+    document.getElementById(`inicio${i}`).value = data[`inicio${i}`] || "";
+    document.getElementById(`golive${i}`).value = data[`golive${i}`] || "";
+    document.getElementById(`status${i}`).value = data[`status${i}`] || "";
+    document.getElementById(`descricao${i}`).value = data[`descricao${i}`] || "";
+    document.getElementById(`entregas${i}`).value = data[`entregas${i}`] || "";
+    document.getElementById(`proximos${i}`).value = data[`proximos${i}`] || "";
+  }
+  alert('Último status carregado!');
+}
+
+function limparTudo() {
+  if (!confirm('Deseja realmente limpar todos os campos?')) return;
+  localStorage.removeItem('statusTRHO');
+  location.reload();
+}
+</script>
+</body>
+</html>

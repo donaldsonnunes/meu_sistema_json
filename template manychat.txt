@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/subscriber/setCustomField",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content",
+              "value": "application-json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "subscriber_id",
+              "value": "={{ $('Webhook1').item.json.body.id }}"
+            },
+            {
+              "name": "field_id",
+              "value": "12809839"
+            },
+            {
+              "name": "field_value",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2100,
+        720
+      ],
+      "id": "1c0ad26d-2ec6-4334-8c5e-f8b23a9affc1",
+      "name": "Define o campo de usuário com a Resposta do Agente1",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ITnr2YONw4MET5Am",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.manychat.com/fb/sending/sendFlow",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"subscriber_id\": {{ $('Webhook1').item.json.body.id }},\n  \"flow_ns\": \"content20250711004524_356177\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2340,
+        720
+      ],
+      "id": "047fb79e-3c1f-4a63-92e8-4ee321af0cbf",
+      "name": "Envia o Fluxo do Manychat1",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "ITnr2YONw4MET5Am",
+          "name": "Bearer Auth - Manychat"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Define o campo de usuário com a Resposta do Agente1": {
+      "main": [
+        [
+          {
+            "node": "Envia o Fluxo do Manychat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ff053ec0136c4fb353ece74b867ddac22e5fa5b8ba7c54d55d6fb622b1ac7411"
+  }
+}

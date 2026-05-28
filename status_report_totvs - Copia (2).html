@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gerador de Status Report – TOTVS RH Orçamento</title>
+<style>
+  /* --- Página e container --- */
+  body { font-family: "Segoe UI", Arial, sans-serif; background:#f5f8fa; margin:0; padding:24px; color:#222; }
+  .wrap { max-width: 1050px; margin: auto; }
+
+  /* --- Cabeçalho do relatório (visual TOTVS) --- */
+  .card { background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin-bottom:18px; }
+  h1 { color:#0063AF; margin:0 0 8px; font-size:20px; }
+  p.lead { margin:6px 0 12px; color:#444; }
+
+  label { display:block; font-weight:600; color:#005f9e; margin-top:10px; }
+  input[type="text"], input[type="date"], select, textarea {
+    width:100%; padding:8px; border:1px solid #d0d7df; border-radius:6px; font-size:14px; box-sizing:border-box;
+    background:#fafafa;
+  }
+  textarea { min-height:72px; resize:vertical; }
+
+  /* --- Projeto/card --- */
+  .project { border:1px solid #e1e7ee; border-radius:10px; padding:14px; margin-bottom:14px; background:#fff; }
+  .project h3 { margin:0 0 8px; color:#004a87; font-size:16px; }
+  .meta { color:#666; margin:6px 0 0; font-size:13px; }
+
+  /* --- estilo das seções do status gerado --- */
+  .status-block { font-family: "Segoe UI", Arial, sans-serif; background:#fff; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 0 10px rgba(0,0,0,0.06); }
+  .status-title { color:#0063AF; text-align:center; margin:0 0 6px; font-size:18px; }
+  .status-dates { text-align:center; color:#555; margin:0 0 12px; font-size:13px; }
+  .sep { border:none; border-top:2px solid #0063AF; margin:14px 0; }
+
+  .section-title { color:#0063AF; margin:12px 0 6px; font-size:15px; }
+
+  /* --- tabela com colunas fixas e grade --- */
+  .table-email {
+    border-collapse:collapse;
+    width:100%;
+    table-layout:fixed;
+    font-family: Arial, sans-serif;
+    font-size:13px;
+  }
+  .table-email th, .table-email td {
+    border:1px solid #999;
+    padding:8px;
+    vertical-align:top;
+    word-wrap:break-word;
+  }
+  .table-email thead th { background:#f2f2f2; font-weight:700; }
+  /* larguras fixas de colunas (50% / 30% / 20%) */
+  .col-etapa { width:50%; }
+  .col-resp  { width:30%; }
+  .col-dead  { width:20%; }
+
+  /* --- botões flutuantes (canto inferior direito) --- */
+  .float-panel {
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:9999;
+  }
+  .float-panel button {
+    background:#0063AF;
+    color:#fff;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.12);
+    cursor:pointer;
+    font-size:14px;
+    min-width:180px;
+  }
+  .float-panel button.secondary { background:#0b6fb1; }
+  .float-panel button.warn { background:#d06b00; }
+  .float-panel button.ghost { background:#3b82c4; opacity:0.95; }
+
+  /* responsividade */
+  @media (max-width:720px){
+    .float-panel button { min-width:140px; font-size:13px; padding:8px 10px; }
+    .wrap { padding:14px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>📌 Resumo Executivo</h1>
+      <p class="lead"><strong>Boa noite!</strong></p>
+      <p class="lead">Segue status semanal conforme andamento dos projetos abaixo:</p>
+
+      <label for="msgGeral">Mensagem Geral (fixa para todos os projetos)</label>
+      <textarea id="msgGeral" placeholder="Ex: As melhorias informadas ao cliente Moura são evoluções que podem impactar outros clientes..."></textarea>
+    </div>
+
+    <div id="projetosContainer"></div>
+  </div>
+
+  <div class="float-panel" aria-hidden="false">
+    <button id="btnGerar" onclick="gerarStatus()">Gerar Status</button>
+    <button id="btnCopiar" class="secondary" onclick="copiarComFormatacao()">Copiar (com formatação)</button>
+    <button id="btnSalvar" class="ghost" onclick="salvarDados()">Salvar</button>
+    <button id="btnCarregar" class="warn" onclick="carregarDados()">Carregar</button>
+  </div>
+
+<script>
+/* -------------------------
+   Setup: cria 10 blocos de projeto
+   ------------------------- */
+const total = 10;
+const projetosContainer = document.getElementById('projetosContainer');
+
+for (let i=1; i<=total; i++){
+  projetosContainer.insertAdjacentHTML('beforeend', `
+  <div class="project" id="proj-${i}">
+    <h3>Cliente ${i}</h3>
+
+    <label>Nome do Cliente</label>
+    <input type="text" id="cliente-${i}" placeholder="Nome do cliente">
+
+    <label>Data de Início</label>
+    <input type="date" id="inicio-${i}">
+
+    <label>Previsão de Go-Live</label>
+    <input type="date" id="golive-${i}" onchange="registrarAlteracaoGoLive(${i}, event)" data-previous-value="">
+    <input type="hidden" id="golive-hist-${i}" value="">
+
+    <label>Status Atual</label>
+    <div style="margin-top:6px;">
+      <button type="button" onclick="setStatus(${i}, '🟢 No prazo')" style="border-radius:20px;padding:6px 10px;margin-right:6px;background:#c8f7c5;border:1px solid #bfe8b3;">🟢</button>
+      <button type="button" onclick="setStatus(${i}, '🟡 Atenção / Atraso')" style="border-radius:20px;padding:6px 10px;margin-right:6px;background:#fff7b1;border:1px solid #ffeaa1;">🟡</button>
+      <button type="button" onclick="setStatus(${i}, '🔴 Crítico')" style="border-radius:20px;padding:6px 10px;background:#ffc9c9;border:1px solid #f4baba;">🔴</button>
+    </div>
+    <input type="text" id="status-${i}" readonly placeholder="Selecione o status clicando na bolinha" style="margin-top:8px;">
+
+    <label>Resumo do Status</label>
+    <textarea id="resumo-${i}" placeholder="Situação atual do projeto"></textarea>
+
+    <label>Entregas Realizadas (uma linha por item: Etapa | Responsável | Deadline) </label>
+    <textarea id="entregas-${i}" placeholder="Ex: Passagem de bastão | TOTVS & Cliente | 05/11/2025"></textarea>
+
+    <label>Próximos Passos (uma linha por item: Etapa | Responsável | Deadline)</label>
+    <textarea id="proximos-${i}" placeholder="Ex: Kickoff | TOTVS & Cliente | 17/11/2025"></textarea>
+  </div>
+  `);
+}
+
+/* -------------------------
+   Helpers
+   ------------------------- */
+function setStatus(i, texto){ document.getElementById(`status-${i}`).value = texto; }
+function formatDateBR(v){ if(!v) return 'Pendente'; const d=new Date(v); return isNaN(d)?v:d.toLocaleDateString('pt-BR'); }
+
+/* Registra a data anterior riscada no campo de histórico */
+function registrarAlteracaoGoLive(i, event) {
+  const inputData = event.target;
+  const novaData = inputData.value;
+  const campoHistorico = document.getElementById(`golive-hist-${i}`);
+
+  let historico = campoHistorico.value.trim();
+  const dataAntiga = inputData.dataset.previousValue;
+
+  if (dataAntiga && dataAntiga !== novaData) {
+    const dataAntigaFormatada = formatDateBR(dataAntiga);
+    const novoItemHistorico = `~~${dataAntigaFormatada}~~`;
+
+    if (!historico.includes(dataAntigaFormatada)) {
+        historico += (historico ? ', ' : '') + novoItemHistorico;
+    }
+
+    campoHistorico.value = historico;
+  }
+
+  // Atualiza o valor anterior para a nova data (que será a antiga na próxima mudança)
+  inputData.dataset.previousValue = novaData;
+}
+
+/* -------------------------
+   Monta tabela com comportamento:
+   - se linha contém '|' -> separa em 3 colunas (Etapa|Responsável|Deadline)
+   - else -> cria uma linha única com colspan=3 e texto limpo
+   - tabela tem largura fixa (50/30/20) e borda (grade completa)
+   ------------------------- */
+function montarTabelaTexto(texto){
+  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
+  if (linhas.length === 0) return `<p style="color:#666;"><em>Nenhum item informado.</em></p>`;
+
+  let t = `<table class="table-email" style="border-collapse:collapse;width:100%;table-layout:fixed;font-family:Arial;font-size:13px;">
+    <thead><tr>
+      <th class="col-etapa" style="width:50%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Etapa</th>
+      <th class="col-resp" style="width:30%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Responsável</th>
+      <th class="col-dead" style="width:20%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Deadline</th>
+    </tr></thead><tbody>`;
+
+  linhas.forEach(l => {
+    if (l.includes('|')) {
+      const cols = l.split('|').map(c => escapeHtml(c.trim()));
+      t += `<tr>
+              <td style="border:1px solid #999;padding:8px;vertical-align:top;">${cols[0]||''}</td>
+              <td style="border:1px solid #999;padding:8px;vertical-align:top;">${cols[1]||''}</td>
+              <td style="border:1px solid #999;padding:8px;vertical-align:top;">${cols[2]||''}</td>
+            </tr>`;
+    } else {
+      // texto livre -> uma célula ocupando as 3 colunas
+      t += `<tr><td colspan="3" style="border:1px solid #999;padding:8px;vertical-align:top;">${escapeHtml(l)}</td></tr>`;
+    }
+  });
+
+  t += `</tbody></table>`;
+  return t;
+}
+
+/* escape básico para evitar injeção de tags quando usuário colar HTML */
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* -------------------------
+   Gera o Status (HTML) mantendo visual antigo
+   ------------------------- */
+function gerarStatus(){
+  let html = '';
+
+  // cabeçalho fixo
+  html += `<div style="font-family: 'Segoe UI', Arial, sans-serif;">`;
+  html += `<h1 style="color:#0063AF;margin-bottom:6px;">📌 Resumo Executivo</h1>`;
+  html += `<p style="margin:0 0 8px;"><strong>Boa noite!</strong></p>`;
+  // MODIFICAÇÃO AQUI: Incluindo o texto solicitado após o Boa noite!
+  html += `<p style="margin:0 0 8px;">Segue status semanal conforme andamento dos projetos abaixo:</p>`;
+  // FIM DA MODIFICAÇÃO
+  
+  const msgGeral = document.getElementById('msgGeral').value.trim();
+  if (msgGeral) html += `<p style="margin:0 0 12px;color:#333;">${escapeHtml(msgGeral)}</p>`;
+  html += `<hr style="border:none;border-top:1px dashed #ddd;margin:12px 0 18px;">`;
+
+  // projetos
+  const projetos = [];
+  for (let i=1;i<=total;i++){
+    const cliente = document.getElementById(`cliente-${i}`).value.trim();
+    if (!cliente) continue;
+
+    const inicio = document.getElementById(`inicio-${i}`).value;
+    const golive = document.getElementById(`golive-${i}`).value;
+    const goliveHist = document.getElementById(`golive-hist-${i}`).value.trim(); // Campo de Histórico
+    const status = document.getElementById(`status-${i}`).value || '⚪ Não informado';
+    const resumo = document.getElementById(`resumo-${i}`).value.trim();
+    const entregas = document.getElementById(`entregas-${i}`).value.trim();
+    const proximos = document.getElementById(`proximos-${i}`).value.trim();
+
+    projetos.push({cliente,inicio,golive,status,resumo,entregas,proximos});
+
+    // bloco com visual similar ao anterior
+    html += `<div class="status-block" style="background:#fff;padding:18px;border-radius:10px;margin-bottom:16px;">`;
+    html += `<h2 class="status-title" style="color:#0063AF;text-align:center;margin:0 0 6px;">${escapeHtml(status)} – ${escapeHtml(cliente)}</h2>`;
+
+    // LÓGICA DE EXIBIÇÃO DA DATA DE GO-LIVE
+    let goLiveDisplay = `<strong>${formatDateBR(golive)}</strong>`;
+    if (goliveHist) {
+      // Usa <del> com um estilo sutil de erro para indicar a mudança
+      const historicoFormatado = goliveHist.replace(/~~(.*?)~~/g, '<del style="color:#a94442;text-decoration:line-through;margin-right:4px;">$1</del>');
+      goLiveDisplay = `${historicoFormatado} ➔ <strong>${formatDateBR(golive)}</strong>`;
+    }
+
+    // A data de Go-Live agora usa o novo display
+    html += `<p class="status-dates" style="text-align:center;color:#666;margin:0 0 12px;">Data de Início: <strong>${formatDateBR(inicio)}</strong> | Go-Live: ${goLiveDisplay}</p>`;
+    html += `<hr class="sep" style="border:none;border-top:2px solid #0063AF;margin:14px 0;">`;
+
+    html += `<h3 class="section-title" style="color:#0063AF;margin:0 0 6px;">1. Resumo Executivo</h3>`;
+    html += `<div style="border:1px solid #ddd;padding:12px;border-radius:8px;background:#fafafa;margin-bottom:10px;">${resumo ? escapeHtml(resumo).replace(/\n/g,'<br>') : '<em>Sem descrição.</em>'}</div>`;
+
+    if (entregas) {
+      html += `<h3 class="section-title" style="color:#0063AF;margin-top:8px;">2. Entregas Realizadas</h3>`;
+      html += montarTabelaTexto(entregas);
+    } else {
+      html += `<h3 class="section-title" style="color:#0063AF;margin-top:8px;">2. Entregas Realizadas</h3><p style="color:#666;"><em>Nenhum item informado.</em></p>`;
+    }
+
+    if (proximos) {
+      html += `<h3 class="section-title" style="color:#0063AF;margin-top:12px;">3. Próximos Passos</h3>`;
+      html += montarTabelaTexto(proximos);
+    } else {
+      html += `<h3 class="section-title" style="color:#0063AF;margin-top:12px;">3. Próximos Passos</h3><p style="color:#666;"><em>Nenhum item informado.</em></p>`;
+    }
+
+    // mensagem geral repetida opcional no final de cada projeto (se existe)
+    if (msgGeral) {
+      html += `<div style="margin-top:14px;border-top:1px dashed #ddd;padding-top:10px;color:#555;">${escapeHtml(msgGeral)}</div>`;
+    }
+
+    html += `</div>`; // fim bloco
+  }
+
+  html += `</div>`; // fim wrapper
+
+  // guarda em um elemento escondido para ser copiado
+  let resultado = document.getElementById('__resultado_status');
+  if (!resultado) {
+    resultado = document.createElement('div');
+    resultado.id = '__resultado_status';
+    resultado.style.display = 'none';
+    document.body.appendChild(resultado);
+  }
+  resultado.innerHTML = html;
+
+  // salva automaticamente (último gerado)
+  localStorage.setItem('ultimoStatusGerado', JSON.stringify({html, timestamp: new Date().toISOString()}));
+
+  alert('✅ Status gerado. Agora clique em "Copiar (com formatação)" para copiar com o layout.');
+}
+
+/* -------------------------
+   Copiar com formatação (text/html) - tenta ClipboardItem, fallback para método compatível
+   ------------------------- */
+async function copiarComFormatacao(){
+  const resultado = document.getElementById('__resultado_status');
+  if (!resultado || !resultado.innerHTML.trim()) {
+    alert('⚠️ Gere o status antes de copiar.');
+    return;
+  }
+  const html = resultado.innerHTML;
+
+  // tenta API moderna (Chrome, Edge)
+  if (navigator.clipboard && window.ClipboardItem) {
+    try {
+      const blob = new Blob([html], { type: 'text/html' });
+      const data = [ new ClipboardItem({ 'text/html': blob }) ];
+      await navigator.clipboard.write(data);
+      alert('✅ Status copiado com formatação! Cole no corpo do e-mail.');
+      return;
+    } catch (e) {
+      // fallback abaixo
+      console.warn('ClipboardItem falhou:', e);
+    }
+  }
+
+  // Fallback: criar elemento contenteditable, selecionar e execCommand('copy')
+  try {
+    const temp = document.createElement('div');
+    temp.style.position = 'fixed';
+    temp.style.left = '-99999px';
+    temp.setAttribute('contenteditable', 'true');
+    temp.innerHTML = html;
+    document.body.appendChild(temp);
+
+    const range = document.createRange();
+    range.selectNodeContents(temp);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    const ok = document.execCommand('copy');
+    sel.removeAllRanges();
+    document.body.removeChild(temp);
+
+    if (ok) {
+      alert('✅ Status copiado com formatação (fallback). Cole no corpo do e-mail.');
+    } else {
+      alert('❌ Não foi possível copiar com formatação automaticamente. Como alternativa, clique em Gerar Status e copie manualmente o conteúdo (abrindo o console ou inspecionando o elemento).');
+    }
+  } catch (err) {
+    alert('❌ Falha ao copiar. Tente novamente (ou use Browser compatível: Chrome/Edge).');
+    console.error(err);
+  }
+}
+
+/* -------------------------
+   Salvar/Carregar dados no localStorage
+   ------------------------- */
+function salvarDados(){
+  const dados = { mensagemGeral: document.getElementById('msgGeral').value, projetos: [] };
+  for (let i=1;i<=total;i++){
+    dados.projetos.push({
+      cliente: document.getElementById(`cliente-${i}`).value,
+      inicio: document.getElementById(`inicio-${i}`).value,
+      golive: document.getElementById(`golive-${i}`).value,
+      goliveHist: document.getElementById(`golive-hist-${i}`).value,
+      status: document.getElementById(`status-${i}`).value,
+      resumo: document.getElementById(`resumo-${i}`).value,
+      entregas: document.getElementById(`entregas-${i}`).value,
+      proximos: document.getElementById(`proximos-${i}`).value
+    });
+  }
+  localStorage.setItem('statusReport_draft', JSON.stringify(dados));
+  alert('💾 Dados salvos localmente (draft). Use "Carregar" para recuperar.');
+}
+
+function carregarDados(){
+  const raw = localStorage.getItem('statusReport_draft');
+  if (!raw) {
+    alert('⚠️ Nenhum draft encontrado no navegador.');
+    return;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    document.getElementById('msgGeral').value = parsed.mensagemGeral || '';
+    parsed.projetos.forEach((p, idx) => {
+      const i = idx+1;
+      if (document.getElementById(`cliente-${i}`)) {
+        document.getElementById(`cliente-${i}`).value = p.cliente || '';
+        document.getElementById(`inicio-${i}`).value = p.inicio || '';
+        document.getElementById(`golive-${i}`).value = p.golive || '';
+        document.getElementById(`golive-hist-${i}`).value = p.goliveHist || '';
+        document.getElementById(`status-${i}`).value = p.status || '';
+        document.getElementById(`resumo-${i}`).value = p.resumo || '';
+        document.getElementById(`entregas-${i}`).value = p.entregas || '';
+        document.getElementById(`proximos-${i}`).value = p.proximos || '';
+        
+        // MODIFICAÇÃO CHAVE: Define o valor anterior para que a próxima alteração seja registrada
+        document.getElementById(`golive-${i}`).dataset.previousValue = p.golive || '';
+      }
+    });
+    alert('📂 Draft carregado com sucesso!');
+  } catch (e) {
+    console.error(e);
+    alert('❌ Erro ao carregar os dados.');
+  }
+}
+
+/* -------------------------
+   Carregar último status gerado (se quiser auto carregar) - opcional
+   ------------------------- */
+// ADIÇÃO: função de carregamento silencioso chamada ao abrir a página.
+function carregarDadosAutomatico(){
+  try {
+    const raw = localStorage.getItem('statusReport_draft');
+    if (!raw) return; // nada salvo ainda
+    const parsed = JSON.parse(raw);
+    document.getElementById('msgGeral').value = parsed.mensagemGeral || '';
+    parsed.projetos.forEach((p, idx) => {
+      const i = idx+1;
+      if (document.getElementById(`cliente-${i}`)) {
+        document.getElementById(`cliente-${i}`).value = p.cliente || '';
+        document.getElementById(`inicio-${i}`).value = p.inicio || '';
+        document.getElementById(`golive-${i}`).value = p.golive || '';
+        document.getElementById(`golive-hist-${i}`).value = p.goliveHist || '';
+        document.getElementById(`status-${i}`).value = p.status || '';
+        document.getElementById(`resumo-${i}`).value = p.resumo || '';
+        document.getElementById(`entregas-${i}`).value = p.entregas || '';
+        document.getElementById(`proximos-${i}`).value = p.proximos || '';
+
+        // MODIFICAÇÃO CHAVE: Define o valor anterior para que a próxima alteração seja registrada
+        document.getElementById(`golive-${i}`).dataset.previousValue = p.golive || '';
+      }
+    });
+  } catch (err) {
+    console.error('Erro ao carregar automaticamente o draft:', err);
+  }
+}
+
+// ✅ Carrega automaticamente o último draft salvo (silencioso)
+window.addEventListener('load', () => {
+  carregarDadosAutomatico();
+});
+</script>
+</body>
+</html>

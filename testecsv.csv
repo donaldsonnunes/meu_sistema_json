@@ -1,0 +1,61 @@
+CODIGO,NOME_DA_ESCALA,DESCRICAO_DA_ESTRUTURA
+00001,Turno Condomínio Adm 2 - 08:00 as 12:00 / 14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00002,Turno Expedição 6 - 21:00 as 01:00/02:00 as 05:00 Sab. 18:00 as 22:00,SEG A SEX 21:00 | 01:00 | 02:00 | 05:00 E SAB 18:00 | 22:00
+00003,Turno Condomínio Adm 1 - 07:30 as 12:00 / 13:30 as 17:00 Sab. 08:00 as 12:00,SEG A QUI 07:30 | 12:00 | 13:30 | 17:00 E SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00004,Turno Expedição 1 - 16:00 as 20:00 / 21:00 as 00:37 Sab. 16:00 as 20:00,SEG A SEX 16:00 | 20:00 | 21:00 | 00:37 E SAB 16:00 | 20:00
+00005,Turno Expedição 2 - 17:00 as 20:30 / 21:30 as 01:30 Sab. 16:00 as 20:00,SEG A SEX 17:00 | 20:30 | 21:30 | 01:30 E SAB 16:00 | 20:00
+00006,Turno Aprendiz Vespertino - 14:00 as 18:00,SEG A SEX 14:00 | 18:00
+00007,Turno Aprendiz Matutino - 08:00 as 12:00,SEG A SEX 08:00 | 12:00
+00008,Turno Comercial Externo - 08:00 as 12:00 / 14:00 as 18:00 Sáb 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00009,Turno Transporte Oficina - 07:00 as 12:00/14:00 as 17:00 Sab 08:00 as 12:00,SEG A SEX 07:00 | 12:00 | 14:00 | 17:00 E SAB 08:00 | 12:00
+00010,Turno Expedição 4 - 19:00 as 23:00 / 00:00 as 03:15 Sab. 16:00 as 20:00,SEG A SEX 19:00 | 23:00 | 00:00 | 03:15 E SAB 16:00 | 20:00
+00011,Turno Recebimento - 07:00 as 11:20 /12:20 as 16:00 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 11:20 | 12:20 | 16:00 E SAB 08:00 | 12:00
+00012,Tuno CFTV 1- 07h às 11:30/12:30 às 16h - Sab. 08h às 12h,SEG A SEX 07:00 | 11:30 | 12:30 | 16:00 E SAB 08:00 | 12:00
+00013,Turno Expedição 5 - 20:00 as 00:00 / 01:00 as 04:07 Sab. 16:00 as 20:00,SEG A SEX 20:00 | 00:00 | 01:00 | 04:07 E SAB 16:00 | 20:00
+00014,Turno Adm/Recebi. 08:00 as 12:00 /13:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 13:00 | 18:00 E SAB 08:00 | 12:00
+00015,Turno Adm/Recebi. 3 - 07:00 as 12:00 / 13:30 as 16:30 Sab. 08:00 as 12:00,SEG A QUI 07:00 | 12:00 | 13:30 | 16:30 E SEX 07:00 | 12:00 | 14:00 | 17:00 E SAB 08:00 | 12:00
+00016,Turno Aprendiz Matutino - 07:30 as 11:30,SEG A SEX 07:30 | 11:30
+00017,Turno Condomínio Adm 4. 10h00-13h30/14:30 - 19:00 Sab. 10:00 as 14:00,SEG A SEX 10:00 | 13:30 | 14:30 | 19:00 E SAB 10:00 | 14:00
+00018,Turno Expedição 3 - 18:00 as 22:00 / 23:00 as 22:22 Sab. 16:00 as 20:00,SEG A SEX 18:00 | 22:00 | 23:00 | 02:22 E SAB 16:00 | 20:00
+00019,Turno Aprendiz Matutino 1 - 07:00 as 11:00,SEG A SEX 07:00 | 11:00
+00020,Turno CFTV 2 -13H Às 17H/18h às 22h - Sab. 12h às 16h,SEG A SEX 13:00 | 17:00 | 18:00 | 22:00 E SAB 12:00 | 16:00
+00021,Turno Aprendiz 01 - 13:30 as 17:30,SEG A SEX 13:30 | 17:30
+00022,Turno Comercial Interno Transp.- 08:00 as 12:00 / 14:00 as 18:00 Sáb 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00023,Turno Condomínio Adm 3- 09:00 as 13:00 / 14:00 as 19:00 Sab. 09:00 as 13:00,SEG A SEX 09:00 | 13:00 | 14:00 | 19:00 E SAB 09:00 | 13:00
+00024,Turno Condomínio Adm 3 - 08:00 as 12:00 / 13:30 as 17:30 Sab. 08:00 as 12:00,SEG A QUI 08:00 | 12:00 | 13:30 | 17:30 E SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00025,Turno Recebimento 1 - 08:00 as 12:00 / 14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00026,Turno Comercial Externo 01 - 08:00 às 12:00h / 13:00 às 17:00 Sab. 08:00 às 12:00,SEG A SEX 08:00 | 12:00 | 13:00 | 17:00 E SAB 08:00 | 12:00
+00027,Turno CFTV 3 - 22h às 02h/ 03h às 06h - Sab. 16h às 20h,SEG A SEX 22:00 | 02:00 | 03:00 | 06:00 E SAB 16:00 | 20:00
+00030,Turno Expedição 1 - 15:00 as 19:00 / 20:00 as 23:45 Sab. 15:00 as 19:00,SEG A SEX 15:00 | 19:00 | 20:00 | 23:45 E SAB 15:00 | 19:00
+00031,Tuno Recebimento 1- 07:00 as 11:45 / 12:45 as 16h00 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 11:45 | 12:45 | 16:00 E SAB 08:00 | 12:00
+00032,Turno Condomínio Adm 1- 07:30 as 12:00 / 13:30 as 17:00 Sab. 08:00 as 12:00,SEG A QUI 07:30 | 12:00 | 13:30 | 17:00 E SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00033,Turno Condomínio Adm 3 - 08:00 as 12:00 / 14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00034,Turno Aprendiz Vespertino - 14:00 as 18h00,SEG A SEX 14:00 | 18:00
+00035,Turno Aprendiz Matutino - 08:00 as 12:00,SEG A SEX 08:00 | 12:00
+00036,Turno Comercial Externo - 08:00 as 12:00 / 14:00 as 18:00 - Sáb 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00037,Turno Aprendiz Vespertino 1 - 13:30 as 17:30,SEG A SEX 13:30 | 17:30
+00038,Turno Expedição 3 - 19:00 as 23:00/ 00:00 as 03:15 Sab. 16:00 as 20:00,SEG A SEX 19:00 | 23:00 | 00:00 | 03:15 E SAB 16:00 | 20:00
+00039,Turno Aprendiz Matutino 01 - 07:00 as 11:00,SEG A SEX 07:00 | 11:00
+00040,Turno Adm/Recebi. 2 - 07:00 as 12:00/13:30 as 16:30 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 12:00 | 13:30 | 16:30 E SAB 08:00 | 12:00
+00041,Turno Adm/Log - 14:00 as 20:00,SEG A SEX 14:00 | 20:00
+00044,Turno Condomínio Adm 1 - 08:00 as 12:00/14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00045,LOGISTICA 02 - 12h as 16:30/18:00 as 21:30,SEG A SEX 12:00 | 16:30 | 18:00 | 21:30 E SAB 12:00 | 16:00
+00046,Turno Recebimento 1- 07:30 as 12:00/13:30 as 17:00 Sab 08:00 as 12:00,SEG A QUI 07:30 | 12:00 | 13:30 | 17:00 E SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00047,Turno Aprendiz Matutino - 08:00 - 12:00,SEG A SEX 08:00 | 12:00
+00048,Turno Aprendiz Vespertino - 14:00 as 18:00,SEG A SEX 14:00 | 18:00
+00049,Turno Comercial Externo 1 - 08:00 as 12:00/14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00050,Turno Comercial Interno Transp. - 08:00 as 12:00 / 14:00 as 18:00 Sab 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00051,TURNO LOGISTICA 03 - 14h as 19h/20h as 23h,SEG A SEX 14:00 | 19:00 | 20:00 | 23:00
+00052,Turno Expedição 1 - 19:00 as 23:00/00:00 as 03:15 Sab. 16:00 as 20:00,SEG A SEX 19:00 | 23:00 | 00:00 | 03:15 E SAB 16:00 | 20:00
+00053,Turno Recebimento 2 - 07:00 as12:00/13:30 as 16:30 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 12:00 | 13:30 | 16:30 E SAB 08:00 | 12:00
+00054,Turno Aprendiz Vespertino1 - 13:00 as 17:00,SEG A SEX 13:00 | 17:00
+00055,Turno Comercial Externo - 08:00 as 12:00/14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00056,Turno Expedição Petrolina 1 - 13:00 as 18:00/19:00 as 22:00 Sab. 13:00 as 17:00,SEG A SEX 13:00 | 18:00 | 19:00 | 22:00 E SAB 13:00 | 17:00
+00057,Turno Expedição Caruaru - 14:00 as 19:00/20:00 as 22:52 Sab 14:00 as 18:00,SEG A SEX 14:00 | 19:00 | 20:00 | 22:52 E SAB 14:00 | 18:00
+00058,Turno Aprendiz Matutino - 08h00-12h00,SEG A SEX 08:00 | 12:00
+00059,Turno Aprendiz Vespertino - 14h00-18h00,SEG A SEX 14:00 | 18:00
+00060,Turno Aprendiz Vespertino 1- 13h00-17h00,SEG A SEX 13:00 | 17:00
+00061,Turno Recebimento Caruaru 1 - 07:00 as 12:00/13:00 as 16:00 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 12:00 | 13:00 | 16:00 E SAB 08:00 | 12:00
+00062,Turno Recebimento Petrolina 1 - 07:00 as 12:00/14:00 as 17:00 Sab. 08:00 as 12:00,SEG A SEX 07:00 | 12:00 | 14:00 | 17:00 E SAB 08:00 | 12:00
+00063,Turno Comercial/Adm 1 - 08:00 as 12:00/14:00 as 18:00 Sab. 08:00 as 12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00
+00064,Turno Comercial Transporte - 08:00 as 12:00/14:00 as 18:00 Sab. 08:00-12:00,SEG A SEX 08:00 | 12:00 | 14:00 | 18:00 E SAB 08:00 | 12:00

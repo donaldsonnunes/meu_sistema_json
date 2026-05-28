@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importador Ahgora - Data Corrigida</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <style>
+        :root { --primary: #0056b3; --bg: #f0f2f5; --text: #1c1e21; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; font-size: 0.9em; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .controls { background: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: grid; gap: 15px; }
+        
+        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: var(--primary); color: white; border: none; padding: 12px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s; }
+        button:hover { background-color: #004494; }
+        button:disabled { background-color: #999; cursor: not-allowed; }
+
+        label { font-weight: 600; display: block; margin-bottom: 5px; }
+        textarea { width: 100%; height: 130px; font-family: 'Consolas', monospace; font-size: 12px; background: #2d2d2d; color: #fff; border: 1px solid #ccc; padding: 10px; border-radius: 4px; }
+        
+        #status-area { margin-top: 20px; padding: 15px; border-radius: 5px; font-weight: bold; text-align: center; display: none; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🛠️ Importador Ahgora (Data YYYY-MM-DD)</h2>
+
+        <div class="alert">
+            <strong>⚠️ Atenção Proxy:</strong> Antes de enviar, <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">ATIVE O PROXY AQUI</a> (clique em "Request temporary access").
+        </div>
+
+        <div class="controls">
+            <div>
+                <label>ID da Empresa:</label>
+                <input type="text" id="empresaId" value="99482958033831298816589179727438">
+            </div>
+            <div>
+                <label>Arquivo CSV:</label>
+                <input type="file" id="csvFile" accept=".csv" />
+            </div>
+            <button id="btnProcess" onclick="processarCSV()">📡 Gerar XML e Enviar</button>
+        </div>
+
+        <div id="status-area"></div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
+            <div>
+                <label>XML Enviado (Confira as datas aqui):</label>
+                <textarea id="xmlPreview" readonly>O XML aparecerá aqui...</textarea>
+            </div>
+            <div>
+                <label>XML Resposta:</label>
+                <textarea id="apiResponse" readonly>Aguardando...</textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+        const TARGET_URL = "https://www.ahgora.com.br/ws/pontoweb.php";
+
+        function processarCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const empresaId = document.getElementById('empresaId').value.trim();
+            const btn = document.getElementById('btnProcess');
+
+            if (!fileInput.files[0]) { alert("Selecione o CSV!"); return; }
+            if (!empresaId) { alert("Preencha o ID da Empresa!"); return; }
+
+            btn.disabled = true;
+            btn.textContent = "Processando...";
+            mostrarStatus('⏳ Gerando XML...', 'info');
+
+            Papa.parse(fileInput.files[0], {
+                header: true,
+                skipEmptyLines: true,
+                transformHeader: h => h.trim(),
+                
+                complete: function(results) {
+                    try {
+                        const xml = gerarXML(results.data, empresaId);
+                        document.getElementById('xmlPreview').value = xml;
+                        enviarViaProxy(xml);
+                    } catch (e) {
+                        mostrarStatus("❌ Erro: " + e.message, 'error');
+                        btn.disabled = false;
+                        btn.textContent = "📡 Tentar Novamente";
+                    }
+                },
+                error: function() {
+                    mostrarStatus("❌ Erro ao ler CSV.", 'error');
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        function formatarDataParaXML(dataInput) {
+            if (!dataInput) return "";
+            const d = dataInput.trim();
+            
+            // Caso 1: Já está no formato YYYY-MM-DD (2015-02-05) -> Mantém
+            if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+
+            // Caso 2: Formato Brasileiro DD/MM/YYYY (05/02/2015) -> Converte
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(d)) {
+                const partes = d.split('/');
+                return `${partes[2]}-${partes[1]}-${partes[0]}`;
+            }
+
+            // Caso 3: Formato YYYYMMDD (20150205) -> Adiciona traços
+            if (/^\d{8}$/.test(d)) {
+                return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`;
+            }
+
+            return d; // Retorna original se não reconhecer (para não quebrar)
+        }
+
+        function gerarXML(linhas, empresaId) {
+            let itens = '';
+            let count = 0;
+
+            linhas.forEach((row, i) => {
+                if (!row.matricula) return;
+
+                const matricula = row.matricula.trim();
+                const datai = formatarDataParaXML(row.datai);
+                const dataf = formatarDataParaXML(row.dataf);
+                const nomeEscala = row.nome_escala ? row.nome_escala.trim() : '';
+                
+                // IMPORTANTE: inicio_jornada é obrigatório. Se vier vazio, coloca '1'.
+                const inicioJornada = row.inicio_jornada ? row.inicio_jornada.trim() : '1';
+
+                // Validação mínima
+                if (!datai || !nomeEscala) {
+                    throw new Error(`Linha ${i+2}: Data Inicial ou Nome da Escala vazios.`);
+                }
+
+                count++;
+                itens += `
+            <FuncionarioEscala>
+                <matricula>${matricula}</matricula>
+                <datai>${datai}</datai>
+                <dataf>${dataf}</dataf>
+                <nome_escala>${nomeEscala}</nome_escala>
+                <inicio_jornada>${inicioJornada}</inicio_jornada>
+            </FuncionarioEscala>`;
+            });
+
+            if (count === 0) throw new Error("Nenhum dado válido encontrado.");
+
+            return `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="https://www.ahgora.com.br/ws">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ws:insereEscalaFuncionarios>
+         <empresa>${empresaId}</empresa>
+         <FuncionariosEscalas>${itens}
+         </FuncionariosEscalas>
+      </ws:insereEscalaFuncionarios>
+   </soapenv:Body>
+</soapenv:Envelope>`;
+        }
+
+        async function enviarViaProxy(xml) {
+            const btn = document.getElementById('btnProcess');
+            const respBox = document.getElementById('apiResponse');
+            
+            mostrarStatus('📤 Enviando via Proxy...', 'info');
+
+            try {
+                const response = await fetch(PROXY_URL + TARGET_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/xml; charset=utf-8',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'SOAPAction': ''
+                    },
+                    body: xml
+                });
+
+                if (response.status === 403) throw new Error("Proxy bloqueado. Ative o link no topo da página.");
+
+                const text = await response.text();
+                respBox.value = text;
+
+                if (response.ok) {
+                    if (text.includes("<success>")) {
+                        mostrarStatus("✅ SUCESSO! Escalas processadas.", 'success');
+                    } else if (text.includes("Results/>") || text.includes("Results />")) {
+                        mostrarStatus("⚠️ Enviado, mas nenhum registro foi processado. Verifique Matrícula ou Data.", 'error');
+                    } else if (text.includes("Fault") || text.includes("error")) {
+                        mostrarStatus("⚠️ Erro na API. Veja o XML de resposta.", 'error');
+                    } else {
+                        mostrarStatus("✅ Resposta recebida.", 'success');
+                    }
+                } else {
+                    mostrarStatus(`❌ Erro HTTP: ${response.status}`, 'error');
+                }
+
+            } catch (err) {
+                mostrarStatus("❌ Erro: " + err.message, 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = "📡 Gerar XML e Enviar";
+        }
+
+        function mostrarStatus(msg, tipo) {
+            const el = document.getElementById('status-area');
+            el.style.display = 'block';
+            el.className = tipo === 'success' ? 'success' : (tipo === 'error' ? 'error' : '');
+            el.style.background = tipo === 'info' ? '#d1ecf1' : '';
+            el.innerText = msg;
+        }
+    </script>
+</body>
+</html>

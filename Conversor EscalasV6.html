@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Escalas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="flex flex-col lg:flex-row gap-8 w-full max-w-4xl">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full lg:w-3/5 space-y-6">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Conversor de Escalas</h1>
+                <p class="text-gray-600">Selecione seu arquivo CSV para gerar o JSON final.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 transition-all duration-300 hover:border-blue-500 hover:bg-gray-50 cursor-pointer">
+                    <input type="file" id="csvFile" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 4h7v4h4v12H6zm2 7v2h8v-2h-8z"/>
+                    </svg>
+                    <p id="fileName" class="text-sm text-gray-500 font-medium mt-2">Arraste ou clique para selecionar o arquivo CSV</p>
+                </div>
+            
+                </div>
+
+            <div id="statusContainer" class="hidden text-center mt-6">
+                <p id="statusMessage" class="text-lg font-medium text-gray-700"></p>
+                <a id="downloadLink" class="inline-block mt-4 px-6 py-3 bg-green-600 text-white font-semibold rounded-xl shadow-md hover:bg-green-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50" download="resultado_final.json">
+                    Download do JSON
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-gray-200 p-6 rounded-2xl shadow-inner w-full lg:w-2/5 space-y-4">
+            <h2 class="text-xl font-bold text-gray-800">Estrutura do Arquivo CSV</h2>
+            <p class="text-gray-700">O arquivo deve ter as seguintes colunas obrigatórias na ordem exata:</p>
+            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                <li><strong class="font-semibold">CODIGO:</strong> O código da escala.</li>
+                <li><strong class="font-semibold">NOME_DA_ESCALA:</strong> O nome completo da escala.</li>
+                <li><strong class="font-semibold">DESCRICAO_DA_ESTRUTURA:</strong> A descrição da regra da escala.</li>
+            </ul>
+            <p class="text-gray-700 mt-4">Você pode adicionar colunas opcionais, que sobrescreverão os valores padrão do JSON:</p>
+            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                <li><strong class="font-semibold">Colunas de Escala:</strong> Use o nome exato da tag JSON (ex: `EXCEDENTE_APURACAO_SEMANAL`, `TIPO_ESCALA`).</li>
+                <li><strong class="font-semibold">Colunas de Jornada:</strong> Use o prefixo <strong class="font-mono">`JOR_`</strong> seguido do nome da tag JSON (ex: <strong class="font-mono">`JOR_FL_HORA_COMPENSAVEL`</strong>, <strong class="font-mono">`JOR_TM_TOLERANCIA_CARGA_NEGATIVA`</strong>).</li>
+            </ul>
+            <p class="text-sm text-gray-600 italic">Exemplo de linha com campos opcionais: `1,ESCALA ADM,SEG A SEX 08:00 AS 18:00, EXCEDENTE_APURACAO_SEMANAL, BANCO, JOR_FL_HORA_COMPENSAVEL, 0`</p>
+        </div>
+    </div>
+    
+    <div class="fixed bottom-0 w-full p-4 bg-yellow-200 text-yellow-800 text-center text-sm font-medium border-t border-yellow-300">
+        <p>Atenção: Sempre importante importar em uma base de teste e validar se os dados estão corretos e o que precisa ajustar.</p>
+        <p>Atenção CSV: Se a descrição da escala (<strong class="font-semibold">DESCRICAO_DA_ESTRUTURA</strong>) contiver vírgulas (ex: <code class="font-mono">TER, QUI...</code>), **ela deve estar entre aspas duplas** no seu arquivo CSV. Caso não esteja, o conversor fará uma tentativa de reconstrução.</p>
+    </div>
+
+    <script>
+        // Funções de utilidade
+        function generateKey() {
+            // Gera uma chave hexadecimal de 24 caracteres sem traços
+            const chars = '0123456789abcdef';
+            let result = '';
+            for (let i = 0; i < 24; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result;
+        }
+
+        // Esta função converte HHMM para HH:MM
+        function formatTimeHhmmToHhMm(timeHhmmStr) {
+            if (!timeHhmmStr) return "";
+            timeHhmmStr = String(timeHhmmStr);
+            // Adiciona um 0 na frente se a hora for de 1 dígito (ex: 7:45 -> 07:45)
+            if (timeHhmmStr.includes(':')) {
+                const parts = timeHhmmStr.split(':');
+                const hour = parts[0].padStart(2, '0');
+                const minute = parts[1].padStart(2, '0');
+                return `${hour}:${minute}`;
+            }
+            if (timeHhmmStr.length === 4 && /^\d+$/.test(timeHhmmStr)) {
+                return `${timeHhmmStr.substring(0, 2)}:${timeHhmmStr.substring(2, 4)}`;
+            }
+            return timeHhmmStr;
+        }
+
+        // Esta função converte HH:MM para HHMM (formato numérico/sem pontuação)
+        function formatTimeHhMmToHhmm(timeHhMmStr) {
+            if (!timeHhMmStr) return "";
+            return String(timeHhMmStr).replace(/[^0-9]/g, '').padStart(4, '0');
+        }
+
+        function standardizeTimeRange(timeRangeStr) {
+            if (!timeRangeStr) return "";
+            return timeRangeStr.replace(/\s+/g, '').replace(/-/g, 'AS').replace(/ÀS/g, 'AS').toUpperCase();
+        }
+
+        function getDayIndices(dayStr) {
+            const dayMap = {
+                'SEG': 0, '2ª': 0, '2A': 0, 'SEGUNDA': 0,
+                'TER': 1, '3ª': 1, '3A': 1, 'TERÇA': 1,
+                'QUA': 2, '4ª': 2, '4A': 2, 'QUARTA': 2,
+                'QUI': 3, '5ª': 3, '5A': 3, 'QUINTA': 3,
+                'SEX': 4, '6ª': 4, '6A': 4, 'SEXTA': 4,
+                'SAB': 5, 'SÁBADO': 5,
+                'DOM': 6, 'DOMINGO': 6
+            };
+            let indices = [];
+            dayStr = dayStr.toUpperCase().trim();
+
+            const intervalMatch = dayStr.match(/([A-ZÀÁÂÃÄÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÇ]+)\s*A\s*([A-ZÀÁÂÃÄÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÇ]+)/);
+            if (intervalMatch) {
+                const startIndex = dayMap[intervalMatch[1]];
+                const endIndex = dayMap[intervalMatch[2]];
+                if (startIndex !== undefined && endIndex !== undefined) {
+                    if (startIndex <= endIndex) {
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            indices.push(i);
+                        }
+                    } else {
+                        for (let i = startIndex; i < 7; i++) {
+                            indices.push(i);
+                        }
+                        for (let i = 0; i <= endIndex; i++) {
+                            indices.push(i);
+                        }
+                    }
+                }
+            } else if (dayStr.includes(',')) {
+                indices = dayStr.split(',').map(d => dayMap[d.trim()]).filter(i => i !== undefined);
+            } else {
+                const index = dayMap[dayStr];
+                if (index !== undefined) {
+                    indices.push(index);
+                }
+            }
+            return Array.from(new Set(indices)).sort();
+        }
+
+        function ensureSpecialJornadasExist(allJornadas) {
+            const dsrKey = "ID_DSR";
+            if (!allJornadas[dsrKey]) {
+                allJornadas[dsrKey] = {
+                    "NOME_JORNADA": "DSR",
+                    "DESC_JORNADA": "",
+                    "FL_DSR": "1",
+                    "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+                    "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+                    "HORAS_CONTRATUAIS_INTERVALO_EXTRA": ["", ""],
+                    "FL_HORA_COMPENSAVEL": "",
+                    "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+                    "FL_TRATAMENTO_CARGA_INFERIOR": "",
+                    "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Padrão",
+                    "TM_TOLERANCIA_CARGA_NEGATIVA": "",
+                    "TM_TOLERANCIA_CARGA_POSITIVA": "",
+                    "TM_INTINERE_ENTRADA": "",
+                    "TM_INTINERE_SAIDA": "",
+                    "TIPO_HORA_ADICIONAL": "",
+                    "TIPO_HORA_ADICIONAL_NOTURNO": "",
+                    "PERIODOS": [
+                        { "TM_HORA_INICIO": "0000", "TM_HORA_FIM": "2400", "DESC_TIPO_HORA": "Hora Padrão" }
+                    ],
+                    "TM_HORA_INICIO": "0000",
+                    "TM_TOLERANCIA_ENTRADA_ANTECIPADA": "",
+                    "TM_TOLERANCIA_ENTRADA_TARDIA": "",
+                    "TM_TOLERANCIA_SAIDA_ANTECIPADA": "",
+                    "TM_TOLERANCIA_SAIDA_TARDIA": "",
+                    "id": dsrKey,
+                    "key": dsrKey
+                };
+            }
+            const folgaKey = "ID_FOLGA";
+            if (!allJornadas[folgaKey]) {
+                allJornadas[folgaKey] = {
+                    "NOME_JORNADA": "FOLGA",
+                    "DESC_JORNADA": "",
+                    "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+                    "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+                    "HORAS_CONTRATUAIS_INTERVALO_EXTRA": ["", ""],
+                    "FL_HORA_COMPENSAVEL": "",
+                    "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+                    "FL_TRATAMENTO_CARGA_INFERIOR": "",
+                    "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Padrão",
+                    "TM_TOLERANCIA_CARGA_NEGATIVA": "",
+                    "TM_TOLERANCIA_CARGA_POSITIVA": "",
+                    "TM_INTINERE_ENTRADA": "",
+                    "TM_INTINERE_SAIDA": "",
+                    "TIPO_HORA_ADICIONAL": "",
+                    "TIPO_HORA_ADICIONAL_NOTURNO": "",
+                    "PERIODOS": [
+                        { "TM_HORA_INICIO": "0000", "TM_HORA_FIM": "2400", "DESC_TIPO_HORA": "Hora Padrão" }
+                    ],
+                    "TM_HORA_INICIO": "0000",
+                    "TM_TOLERANCIA_ENTRADA_ANTECIPADA": "",
+                    "TM_TOLERANCIA_ENTRADA_TARDIA": "",
+                    "TM_TOLERANCIA_SAIDA_ANTECIPADA": "",
+                    "TM_TOLERANCIA_SAIDA_TARDIA": "",
+                    "id": folgaKey,
+                    "key": folgaKey
+                };
+            }
+        }
+        
+        function parseTimePunches(punchTimesStr) {
+            // CORREÇÃO: Regex ajustada para aceitar 1 ou 2 dígitos para a hora (ex: 7:45 ou 07:45)
+            // Também aceita espaços ou "|" como separador de batidas
+            const rawPunches = Array.from(punchTimesStr.matchAll(/(\d{1,2}:?\d{2})/g), m => m[1]);
+            // Converte todos os horários para HH:MM para a lista HORAS_CONTRATUAIS
+            const contractualHoursHhMm = rawPunches.map(p => formatTimeHhmmToHhMm(p)); 
+            
+            const contractualHours = contractualHoursHhMm; // Mantém a lista completa no formato HH:MM
+            const periods = [];
+            const batidaAutomatica = [];
+
+            if (contractualHours.length === 0) {
+                return { contractualHours: [], periods: [], batidaAutomatica: [] };
+            }
+
+            // Início do dia (00:00 até a primeira batida)
+            periods.push({
+                "TM_HORA_INICIO": "0000",
+                "TM_HORA_FIM": formatTimeHhMmToHhmm(contractualHours[0]),
+                "DESC_TIPO_HORA": "Hora Padrão"
+            });
+
+            // Lógica para todos os turnos (2, 4 ou mais marcações)
+            for (let i = 0; i < contractualHours.length; i += 2) {
+                if (i + 1 < contractualHours.length) {
+                    const startExpHhmm = formatTimeHhMmToHhmm(contractualHours[i]);
+                    const endExpHhmm = formatTimeHhMmToHhmm(contractualHours[i + 1]);
+
+                    // Adiciona o período de Expediente
+                    if (parseInt(startExpHhmm) > parseInt(endExpHhmm)) {
+                        // Noturno
+                        periods.push({
+                            "TM_HORA_INICIO": startExpHhmm,
+                            "TM_HORA_FIM": "2400",
+                            "DESC_TIPO_HORA": "Expediente"
+                        });
+                        periods.push({
+                            "TM_HORA_INICIO": "0000",
+                            "TM_HORA_FIM": endExpHhmm,
+                            "DESC_TIPO_HORA": "Expediente"
+                        });
+                    } else {
+                        // Diurno
+                        periods.push({
+                            "TM_HORA_INICIO": startExpHhmm,
+                            "TM_HORA_FIM": endExpHhmm,
+                            "DESC_TIPO_HORA": "Expediente"
+                        });
+                    }
+
+                    // Adiciona o período de Intervalo (se houver mais batidas após o fim deste expediente)
+                    if (i + 2 < contractualHours.length) {
+                        const intervalStartHhmm = endExpHhmm;
+                        const intervalEndHhmm = formatTimeHhMmToHhmm(contractualHours[i + 2]);
+                        
+                        // Garante que o intervalo é real e não um erro de parse ou horário noturno 'virando'
+                        if (parseInt(intervalStartHhmm) < parseInt(intervalEndHhmm)) {
+                            periods.push({
+                                "TM_HORA_INICIO": intervalStartHhmm,
+                                "TM_HORA_FIM": intervalEndHhmm,
+                                "DESC_TIPO_HORA": "Hora Padrão"
+                            });
+                            // Adiciona as batidas de intervalo para batida_automatica (se houver)
+                            batidaAutomatica.push(intervalStartHhmm, intervalEndHhmm); 
+                        }
+                    }
+                }
+            }
+
+            // Final do dia (última batida até 24:00)
+            if (contractualHours.length > 0) {
+                periods.push({
+                    "TM_HORA_INICIO": formatTimeHhMmToHhmm(contractualHours[contractualHours.length - 1]),
+                    "TM_HORA_FIM": "2400",
+                    "DESC_TIPO_HORA": "Hora Padrão"
+                });
+            }
+
+            // Remove duplicatas e ordena batidaAutomatica
+            const uniqueBatidaAutomatica = [...new Set(batidaAutomatica)].sort();
+
+            return { contractualHours, periods, batidaAutomatica: uniqueBatidaAutomatica };
+        }
+
+        function parseSimpleTimeRange(timeRangeStr) {
+            const timeRangeStrStd = standardizeTimeRange(timeRangeStr);
+            const contractualHours = [];
+            const periods = [];
+            let batidaAutomatica = [];
+
+            const matchInterval = timeRangeStrStd.match(/(.+)E(\d{1,2}:?\d{2})AS(\d{1,2}:?\d{2})$/) || timeRangeStrStd.match(/(.+)E(\d{1,2}:?\d{2})-(\d{1,2}:?\d{2})$/);
+            
+            let mainRangeStr = timeRangeStrStd;
+            if (matchInterval) {
+                mainRangeStr = matchInterval[1].trim();
+                const intervalStartHhmm = formatTimeHhMmToHhmm(matchInterval[2]);
+                const intervalEndHhmm = formatTimeHhMmToHhmm(matchInterval[3]);
+                batidaAutomatica = [intervalStartHhmm, intervalEndHhmm];
+            }
+
+            const parts = mainRangeStr.split('AS');
+            if (parts.length === 2) {
+                const startTimeHhmm = formatTimeHhMmToHhmm(parts[0].trim());
+                const endTimeHhmm = formatTimeHhMmToHhmm(parts[1].trim());
+
+                if (batidaAutomatica.length === 2) {
+                    contractualHours.push(formatTimeHhMmToHhMm(startTimeHhmm), formatTimeHhMmToHhmm(batidaAutomatica[0]), formatTimeHhMmToHhmm(batidaAutomatica[1]), formatTimeHhMmToHhmm(endTimeHhmm));
+                    periods.push({ "TM_HORA_INICIO": "0000", "TM_HORA_FIM": startTimeHhmm, "DESC_TIPO_HORA": "Hora Padrão" });
+                    periods.push({ "TM_HORA_INICIO": startTimeHhmm, "TM_HORA_FIM": batidaAutomatica[0], "DESC_TIPO_HORA": "Expediente" });
+                    periods.push({ "TM_HORA_INICIO": batidaAutomatica[0], "TM_HORA_FIM": batidaAutomatica[1], "DESC_TIPO_HORA": "Hora Padrão" });
+                    periods.push({ "TM_HORA_INICIO": batidaAutomatica[1], "TM_HORA_FIM": endTimeHhmm, "DESC_TIPO_HORA": "Expediente" });
+                } else {
+                    contractualHours.push(formatTimeHhMmToHhmm(startTimeHhmm), formatTimeHhMmToHhmm(endTimeHhmm));
+                    periods.push({ "TM_HORA_INICIO": "0000", "TM_HORA_FIM": startTimeHhmm, "DESC_TIPO_HORA": "Hora Padrão" });
+                    periods.push({ "TM_HORA_INICIO": startTimeHhmm, "TM_HORA_FIM": endTimeHhmm, "DESC_TIPO_HORA": "Expediente" });
+
+                    if (parseInt(startTimeHhmm) <= 1200 && parseInt(endTimeHhmm) >= 1300) {
+                        const defaultIntervalStartHhmm = "1200";
+                        const defaultIntervalEndHhmm = "1300";
+                        batidaAutomatica = [defaultIntervalStartHhmm, defaultIntervalEndHhmm];
+                        contractualHours.splice(1, 0, formatTimeHhmmToHhMm(defaultIntervalStartHhmm), formatTimeHhMmToHhmm(defaultIntervalEndHhmm));
+                        periods.splice(2, 0, { "TM_HORA_INICIO": defaultIntervalStartHhmm, "TM_HORA_FIM": defaultIntervalEndHhmm, "DESC_TIPO_HORA": "Hora Padrão" });
+                    }
+                }
+                
+                periods.push({ "TM_HORA_INICIO": formatTimeHhMmToHhmm(contractualHours[contractualHours.length - 1]), "TM_HORA_FIM": "2400", "DESC_TIPO_HORA": "Hora Padrão" });
+            }
+            return { contractualHours, periods, batidaAutomatica: [...new Set(batidaAutomatica)].sort() };
+        }
+
+        function createJornadaObject(nomeJornadaRaw, customFields = {}) {
+            // Verifica se é uma jornada de marcações (usa '|') ou se tem 2 ou mais horários sem ser no formato AS
+            const multipleTimesMatch = nomeJornadaRaw.split(/\s+|\|/).filter(s => s.match(/^\d{1,2}:?\d{2}$/)).length >= 2;
+            const isPunches = nomeJornadaRaw.includes('|') || (multipleTimesMatch && !nomeJornadaRaw.toUpperCase().includes('AS'));
+            
+            let result;
+            if (isPunches) {
+                result = parseTimePunches(nomeJornadaRaw);
+            } else {
+                result = parseSimpleTimeRange(nomeJornadaRaw);
+            }
+
+            // Os valores base (calculados)
+            const { contractualHours, periods, batidaAutomatica } = result;
+
+            let nomeJornadaDisplay = nomeJornadaRaw;
+            
+            // CORREÇÃO: Garante o formato 'HH:MM | HH:MM | ...' para jornadas com batidas
+            if (isPunches && contractualHours.length > 0) {
+                nomeJornadaDisplay = contractualHours.join(' | ');
+            } else if (contractualHours.length === 4 && !isPunches) {
+                 // Mantém o formato alternativo se não foi pego como isPunches mas tem 4 marcações (ex: 08:00 AS 12:00 E 13:00 AS 17:00)
+                 nomeJornadaDisplay = `${contractualHours[0]} - ${contractualHours[1]} / ${contractualHours[2]} - ${contractualHours[3]}`;
+            } else if (contractualHours.length === 2 && !isPunches) {
+                nomeJornadaDisplay = `${contractualHours[0]} - ${contractualHours[1]}`;
+            } else {
+                // Caso fallback: USA o nome original (ex: '0800AS1800')
+                nomeJornadaDisplay = nomeJornadaRaw.replace(/\s*AS\s*/g, ' - ').replace(/\|/g, '').trim(); 
+            }
+
+            const newKey = generateKey();
+            
+            // 1. Definir o objeto base com os defaults
+            const baseJornada = {
+                "NOME_JORNADA": nomeJornadaDisplay,
+                "DESC_JORNADA": "",
+                "HORAS_CONTRATUAIS": contractualHours,
+                "TRATAMENTO_EXPEDIENTE_EXTRA": "",
+                "TRATAMENTO_ADICIONAL_PARA_PERIODO_DO_DIA": "",
+                "HORAS_CONTRATUAIS_INTERVALO_EXTRA": ["", ""],
+                "FL_HORA_COMPENSAVEL": "1",
+                "FL_ADICIONAL_NOTURNO_SOBRE_EXTRA": "",
+                "FL_TRATAMENTO_CARGA_INFERIOR": "Hora Padrão",
+                "FL_TRATAMENTO_CARGA_SUPERIOR": "Hora Padrão",
+                "PREASSINALA_SOMENTE_BATIDAS_PARES": true,
+                "batida_automatica": batidaAutomatica,
+                "TM_TOLERANCIA_CARGA_NEGATIVA": "",
+                "TM_TOLERANCIA_CARGA_POSITIVA": "",
+                "TM_INTINERE_ENTRADA": "",
+                "TM_INTINERE_SAIDA": "",
+                "TIPO_HORA_ADICIONAL": "",
+                "TIPO_HORA_ADICIONAL_NOTURNO": "",
+                "PERIODOS": periods,
+                "TM_HORA_INICIO": "0000",
+                "TM_TOLERANCIA_ENTRADA_ANTECIPADA": "",
+                "TM_TOLERANCIA_ENTRADA_TARDIA": "",
+                "TM_TOLERANCIA_SAIDA_ANTECIPADA": "",
+                "TM_TOLERANCIA_SAIDA_TARDIA": "",
+                "id": newKey,
+                "key": newKey
+            };
+            
+            // 2. Aplicar os campos customizados do CSV (JOR_xxx)
+            // Usa Object.assign para sobrescrever os valores padrão com os valores customizados do CSV.
+            const finalJornada = Object.assign(baseJornada, customFields);
+            
+            return finalJornada;
+        }
+
+        function processScheduleDescription(description, jornadaMapping, allJornadas, jornadaCustomFields, scaleName) {
+            // Limpa aspas duplas, caso o CSV tenha problemas de formatação
+            const cleanDescription = description.replace(/"/g, ''); 
+            const descriptionUpper = cleanDescription.toUpperCase();
+            let jornadasSemanais = Array(7).fill("ID_FOLGA");
+            let scaleType = "SEMANAL";
+            
+            // Combina a descrição e o nome da escala para detecção robusta de 12x36
+            const combinedText = (descriptionUpper + " " + scaleName.toUpperCase()).replace(/\s+/g, ' ');
+
+            // Tratamento prioritário para escalas 12x36
+            const diaADiaMatch = combinedText.match(/DIA 1\s*([0-9:\s|ÀS\s-]+)\s*DIA 2\s*FOLGA/);
+            const timeMatch12x36 = combinedText.match(/12\s*X\s*36[\s-]*([0-9:\sASÀS|\-]+)/); 
+            
+            if (diaADiaMatch || combinedText.includes('12X36')) { 
+                scaleType = "12X36";
+                let timeRange = '00:00 AS 00:00';
+
+                if (diaADiaMatch) {
+                    timeRange = diaADiaMatch[1].trim();
+                } else if (timeMatch12x36) {
+                    timeRange = timeMatch12x36[1].trim();
+                } else {
+                    const fallbackTimeMatch = combinedText.match(/(\d{1,2}:\d{2})\s*AS\s*(\d{1,2}:\d{2})/);
+                    if (fallbackTimeMatch) {
+                        timeRange = `${fallbackTimeMatch[1]} AS ${fallbackTimeMatch[2]}`;
+                    }
+                }
+                
+                const standardizedTime = standardizeTimeRange(timeRange);
+
+                if (!jornadaMapping[standardizedTime]) {
+                    const newJornada = createJornadaObject(timeRange, jornadaCustomFields);
+                    jornadaMapping[standardizedTime] = newJornada.key;
+                    allJornadas[newJornada.key] = newJornada;
+                }
+                const jornadaKey = jornadaMapping[standardizedTime];
+                
+                jornadasSemanais = [jornadaKey, "ID_FOLGA"];
+                
+            } else if (descriptionUpper.includes('6X1')) {
+                // Tratamento 6x1
+                scaleType = "6X1";
+                const timeMatch = descriptionUpper.match(/6\s*X\s*1\s*-\s*([0-9:\sASÀS|\-]+)/);
+                const timeRange = timeMatch ? timeMatch[1].trim() : '00:00 AS 00:00';
+                const standardizedTime = standardizeTimeRange(timeRange);
+
+                if (!jornadaMapping[standardizedTime]) {
+                    const newJornada = createJornadaObject(timeRange, jornadaCustomFields);
+                    jornadaMapping[standardizedTime] = newJornada.key;
+                    allJornadas[newJornada.key] = newJornada;
+                }
+                const jornadaKey = jornadaMapping[standardizedTime];
+                for (let i = 0; i < 6; i++) {
+                    jornadasSemanais[i] = jornadaKey;
+                }
+                jornadasSemanais[6] = "ID_DSR";
+            } else {
+                // Lógica para escalas semanais complexas
+                let complexRuleProcessed = false;
+                
+                // Regex Global REFORÇADA: Procura por todas as regras de jornada na string.
+                // Group 1: Dias (SEG A SEX, SAB, TER, QUI)
+                // Group 2: Horários (11:00 | 15:00 | 16:00 | 19:00)
+                const ruleRegex = /((?:SEG|TER|QUA|QUI|SEX|SAB|DOM)[\sA-ZÀÁÂÃÄÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÇ,\s]*?)\s*((?:\d{1,2}:?\d{2}[\s|AS-]*)*\d{1,2}:?\d{2})/g;
+                let match;
+                
+                // Itera sobre todos os pares de DIAS e HORÁRIOS encontrados na descrição
+                while ((match = ruleRegex.exec(descriptionUpper)) !== null) {
+                    complexRuleProcessed = true;
+                    const daysPart = match[1].trim(); 
+                    const timesPartRaw = match[2].trim(); 
+                    
+                    const dayIndices = getDayIndices(daysPart);
+                    
+                    let currentJornadaKey = "ID_FOLGA";
+                    if (timesPartRaw) {
+                        const standardizedTime = standardizeTimeRange(timesPartRaw);
+                        if (!jornadaMapping[standardizedTime]) {
+                            const newJornada = createJornadaObject(timesPartRaw, jornadaCustomFields);
+                            jornadaMapping[standardizedTime] = newJornada.key;
+                            allJornadas[newJornada.key] = newJornada;
+                        }
+                        currentJornadaKey = jornadaMapping[standardizedTime];
+                    }
+                    
+                    dayIndices.forEach(idx => {
+                        if (idx >= 0 && idx < 7) {
+                            jornadasSemanais[idx] = currentJornadaKey;
+                        }
+                    });
+                }
+
+                // DSR FIX: Força o Domingo (índice 6) a ser DSR se houver pelo menos uma jornada preenchida (6x1 padrão)
+                if (jornadasSemanais[6] === "ID_FOLGA" && jornadasSemanais.some(key => key !== "ID_FOLGA" && key !== "ID_DSR")) {
+                    jornadasSemanais[6] = "ID_DSR";
+                }
+            }
+            
+            ensureSpecialJornadasExist(allJornadas);
+            return { jornadas: jornadasSemanais, type: scaleType };
+        }
+        
+        function calculateCargaHoraria(jornadasList, allJornadasDefinitions) {
+            let totalMinutes = 0;
+            jornadasList.forEach(jornadaKey => {
+                if (allJornadasDefinitions[jornadaKey] && jornadaKey !== "ID_DSR" && jornadaKey !== "ID_FOLGA") {
+                    const jornada = allJornadasDefinitions[jornadaKey];
+                    jornada.PERIODOS.forEach(period => {
+                        if (period.DESC_TIPO_HORA === 'Expediente') {
+                            const start = period.TM_HORA_INICIO;
+                            const end = period.TM_HORA_FIM;
+                            const startTime = parseInt(start.substring(0, 2)) * 60 + parseInt(start.substring(2));
+                            const endTime = parseInt(end.substring(0, 2)) * 60 + parseInt(end.substring(2));
+                            let duration = endTime - startTime;
+                            if (duration < 0) duration += 24 * 60; // Para turnos noturnos
+                            totalMinutes += duration;
+                        }
+                    });
+                }
+            });
+            return String(Math.round(totalMinutes / 60));
+        }
+
+        function processCsv(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            const allScales = [];
+            const allJornadasDefinitions = {};
+            const jornadaMapping = {};
+            const usedScaleNames = new Set();
+            
+            const rawHeaders = lines[0].split(',').map(h => h.trim().toUpperCase());
+            const dataLines = lines.slice(1);
+
+            const colMap = {};
+            rawHeaders.forEach((header, index) => {
+                colMap[header] = index;
+            });
+
+            // Colunas obrigatórias
+            const MANDATORY_COLS = ['CODIGO', 'NOME_DA_ESCALA', 'DESCRICAO_DA_ESTRUTURA'];
+            
+            for (const csvHeader of MANDATORY_COLS) {
+                if (colMap[csvHeader] === undefined) {
+                    throw new Error(`CSV deve conter a coluna obrigatória: '${csvHeader}'`);
+                }
+            }
+
+            // Mapeamento de campos opcionais de ESCALA (CSV Header para JSON Key)
+            const OPTIONAL_SCALE_FIELDS_MAP = {
+                'TIPO_ESCALA': 'tipo_escala',
+                'COD_ADICIONAL_NOTURNO': 'COD_ADICIONAL_NOTURNO',
+                'EXCEDENTE_APURACAO_SEMANAL': 'excedente_apuracao_semanal',
+                'DEFICIT_APURACAO_SEMANAL': 'deficit_apuracao_semanal',
+                'EXCEDENTE_APURACAO_MENSAL': 'excedente_apuracao_mensal',
+                'DEFICIT_APURACAO_MENSAL': 'deficit_apuracao_mensal',
+                'TIPO_HORA_ADICIONAL': 'TIPO_HORA_ADICIONAL', 
+                'TIPO_HORA_ADICIONAL_NOTURNO': 'TIPO_HORA_ADICIONAL_NOTURNO'
+            };
+            
+            // Mapeamento de campos opcionais de JORNADA (CSV Header com JOR_ para JSON Key)
+            const OPTIONAL_JORNADA_FIELDS_MAP = {};
+            rawHeaders.forEach(header => {
+                if (header.startsWith('JOR_')) {
+                    const jsonKey = header.substring(4); // Remove 'JOR_'
+                    if (jsonKey !== 'HORAS_CONTRATUAIS') { 
+                        OPTIONAL_JORNADA_FIELDS_MAP[header] = jsonKey;
+                    }
+                }
+            });
+
+
+            dataLines.forEach(line => {
+                // Tenta fazer o split original.
+                let columns = line.split(',');
+
+                const codIndex = colMap['CODIGO'];
+                const nomeIndex = colMap['NOME_DA_ESCALA'];
+                const descIndex = colMap['DESCRICAO_DA_ESTRUTURA'];
+                
+                // 1. Processar Campos Obrigatórios (Tenta ler o que foi dividido)
+                const cod = columns[codIndex] ? columns[codIndex].trim() : "";
+                let nomeEscala = columns[nomeIndex] ? columns[nomeIndex].trim() : "";
+                let descricaoEstrutura = columns[descIndex] ? columns[descIndex].trim().replace(/"/g, '') : "";
+
+                // NOVO: Tentativa de reconstruir a descrição se ela foi truncada, 
+                // para lidar com vírgulas não escapadas DENTRO da descrição.
+                if (columns.length > rawHeaders.length) {
+                    
+                    // Reverte para uma tentativa de pegar tudo após NOME_DA_ESCALA
+                    const parts = line.split(',');
+                    if (parts.length > nomeIndex + 1) {
+                        descricaoEstrutura = parts.slice(nomeIndex + 1).join(',').trim().replace(/"/g, '');
+                    }
+                    
+                    // Re-cria o array columns, mantendo apenas os campos obrigatórios.
+                    columns = [
+                        cod, 
+                        nomeEscala, 
+                        descricaoEstrutura
+                    ];
+                }
+                
+                if (!cod || !nomeEscala || !descricaoEstrutura) return; // Pula linha inválida
+
+
+                // 1.1. Extrair Campos Opcionais
+                const escalaCustomFields = {};
+                const jornadaCustomFields = {};
+
+                // A leitura é feita contra os headers, mas os 'columns' podem estar truncados.
+                rawHeaders.forEach((csvHeader, idx) => {
+                    if (idx < columns.length) {
+                        const value = columns[idx] ? columns[idx].trim() : "";
+                        
+                        if (value === "") return;
+
+                        if (csvHeader.startsWith('JOR_')) {
+                            const jsonKey = csvHeader.substring(4); 
+                            if (jsonKey !== 'HORAS_CONTRATUAIS') {
+                                jornadaCustomFields[jsonKey] = value;
+                            }
+                        } else {
+                            const jsonKey = OPTIONAL_SCALE_FIELDS_MAP[csvHeader];
+                            if (jsonKey) {
+                                escalaCustomFields[jsonKey] = value;
+                            } 
+                        }
+                    }
+                });
+
+                // Lógica para nome de escala duplicada
+                let originalNomeEscala = nomeEscala;
+                let counter = 1;
+                while (usedScaleNames.has(nomeEscala)) {
+                    nomeEscala = `${originalNomeEscala} - ${counter}`;
+                    counter++;
+                }
+                usedScaleNames.add(nomeEscala);
+
+                // Processar a descrição e criar as jornadas
+                const { jornadas, type } = processScheduleDescription(descricaoEstrutura, jornadaMapping, allJornadasDefinitions, jornadaCustomFields, nomeEscala);
+                
+                const cargaHoraria = calculateCargaHoraria(jornadas, allJornadasDefinitions);
+                const newKey = generateKey();
+                
+                // 2. Inicializar Objeto da Escala com Padrões
+                const baseScaleObj = {
+                    "NOME": nomeEscala,
+                    "DESC_ESCALA": descricaoEstrutura, // Usa a descrição reconstruída
+                    "COD": cod,
+                    "carga_horaria": cargaHoraria,
+                    "tipo_escala": "", 
+                    "ignora_carga_horaria_e_tipo_funcionario": "ignora_carga_horaria_e_tipo_funcionario",
+                    "TIPO": type, 
+                    "JORNADAS": jornadas,
+                    "dsr": { "carga_horaria": "", "desconto": "" },
+                    "TIPO_HORA_ADICIONAL": "",
+                    "TIPO_HORA_ADICIONAL_NOTURNO": "",
+                    "COD_ADICIONAL_NOTURNO": "", 
+                    "excedente_apuracao_semanal": "", 
+                    "deficit_apuracao_semanal": "", 
+                    "excedente_apuracao_mensal": "", 
+                    "deficit_apuracao_mensal": "", 
+                    "key": newKey,
+                    "id": newKey
+                };
+
+                // 3. Aplicar Mapeamento Customizado de ESCALA: Sobrescreve os padrões com os valores customizados
+                const scaleObj = Object.assign(baseScaleObj, escalaCustomFields);
+
+                allScales.push(scaleObj);
+            });
+
+            const usedJornadaKeys = new Set();
+            allScales.forEach(scale => scale.JORNADAS.forEach(key => usedJornadaKeys.add(key)));
+
+            const filteredJornadas = {};
+            usedJornadaKeys.forEach(key => {
+                if (allJornadasDefinitions[key]) {
+                    filteredJornadas[key] = allJornadasDefinitions[key];
+                }
+            });
+
+            return {
+                "escalas": allScales,
+                "jornadas": filteredJornadas,
+                "horas_adicionais": {}
+            };
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('csvFile');
+            const fileNameDisplay = document.getElementById('fileName');
+            const statusContainer = document.getElementById('statusContainer');
+            const statusMessage = document.getElementById('statusMessage');
+            const downloadLink = document.getElementById('downloadLink');
+
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    fileNameDisplay.textContent = 'Arraste ou clique para selecionar o arquivo CSV';
+                    statusContainer.classList.add('hidden');
+                    return;
+                }
+
+                fileNameDisplay.textContent = file.name;
+                statusMessage.textContent = 'Processando...';
+                statusContainer.classList.remove('hidden');
+                downloadLink.classList.add('hidden');
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const jsonData = processCsv(e.target.result);
+                        const jsonStr = JSON.stringify(jsonData, null, 4);
+                        const blob = new Blob([jsonStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+
+                        downloadLink.href = url;
+                        downloadLink.classList.remove('hidden');
+                        statusMessage.textContent = 'JSON gerado com sucesso!';
+                    } catch (error) {
+                        statusMessage.textContent = `Erro: ${error.message}`;
+                        console.error('Erro durante o processamento:', error);
+                        downloadLink.classList.add('hidden');
+                    }
+                };
+                reader.onerror = () => {
+                    statusMessage.textContent = 'Erro ao ler o arquivo.';
+                    console.error('Erro ao ler o arquivo:', reader.error);
+                    downloadLink.classList.add('hidden');
+                };
+                reader.readAsText(file);
+            });
+        });
+    </script>
+</body>
+</html>

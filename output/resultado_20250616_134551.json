@@ -1,0 +1,87 @@
+{
+    "escalas": [
+        {
+            "NOME": "0006PA 12X36 DIURNO",
+            "DESC_ESCALA": "0006PA 12X36 DIURNO",
+            "COD": "5",
+            "carga_horaria": "11",
+            "tipo_escala": "",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "ac58fbe37d6943428695d4b60c349286",
+                "ID_FOLGA"
+            ],
+            "key": "23c682b4542b46c5ab571c9e2f82bba2"
+        },
+        {
+            "NOME": "0007PA 12X36 NOTURNO",
+            "DESC_ESCALA": "0007PA 12X36 NOTURNO",
+            "COD": "6",
+            "carga_horaria": "11",
+            "tipo_escala": "",
+            "TIPO": "12X36",
+            "JORNADAS": [
+                "ac58fbe37d6943428695d4b60c349286",
+                "ID_FOLGA"
+            ],
+            "key": "09362b1d58be455090a6962d46b3ddad"
+        }
+    ],
+    "jornadas": {
+        "ac58fbe37d6943428695d4b60c349286": {
+            "NOME_JORNADA": "07:00 AS 19:00",
+            "DESC_JORNADA": "",
+            "HORAS_CONTRATUAIS": [
+                "07:00",
+                "12:30",
+                "13:30",
+                "19:00"
+            ],
+            "PREASSINALA_SOMENTE_BATIDAS_PARES": true,
+            "batida_automatica": [
+                "1230",
+                "1330"
+            ],
+            "PERIODOS": [
+                {
+                    "TM_HORA_INICIO": "0000",
+                    "TM_HORA_FIM": "0700",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                },
+                {
+                    "TM_HORA_INICIO": "0700",
+                    "TM_HORA_FIM": "1230",
+                    "DESC_TIPO_HORA": "Expediente"
+                },
+                {
+                    "TM_HORA_INICIO": "1230",
+                    "TM_HORA_FIM": "1330",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                },
+                {
+                    "TM_HORA_INICIO": "1330",
+                    "TM_HORA_FIM": "1900",
+                    "DESC_TIPO_HORA": "Expediente"
+                },
+                {
+                    "TM_HORA_INICIO": "1900",
+                    "TM_HORA_FIM": "2400",
+                    "DESC_TIPO_HORA": "Hora Extra 50%"
+                }
+            ],
+            "key": "ac58fbe37d6943428695d4b60c349286"
+        },
+        "ID_DSR": {
+            "NOME_JORNADA": "DSR",
+            "FL_DSR": "1",
+            "key": "ID_DSR",
+            "PERIODOS": []
+        },
+        "ID_FOLGA": {
+            "NOME_JORNADA": "FOLGA",
+            "key": "ID_FOLGA",
+            "PERIODOS": []
+        }
+    },
+    "horas_adicionais": []
+}

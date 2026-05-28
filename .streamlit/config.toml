@@ -1,0 +1,15 @@
+[theme]
+# Cor primária para elementos interativos
+primaryColor = "#2B8CFA"  # Um azul moderno e acessível
+
+# Cor de fundo principal da aplicação
+backgroundColor = "#1A1A1A"  # Cinza bem escuro
+
+# Cor de fundo para elementos da sidebar e containers
+secondaryBackgroundColor = "#2C2C2C" # Cinza um pouco mais claro
+
+# Cor do texto principal
+textColor = "#FFFFFF" # Branco
+
+# Fonte
+font = "sans serif"

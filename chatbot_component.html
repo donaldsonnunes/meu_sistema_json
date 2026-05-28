@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Componente de Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chat-container::-webkit-scrollbar { width: 4px; }
+        .chat-container::-webkit-scrollbar-thumb { background-color: #94a3b8; border-radius: 20px; }
+        .chat-bubble-bot { background-color: #f1f5f9; color: #1e293b; }
+        .chat-bubble-user { background-color: #2563eb; color: #ffffff; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-screen antialiased text-slate-800">
+
+    <div class="flex-1 p-4 overflow-y-auto chat-container" id="chat-container">
+        <!-- Mensagens do chat -->
+    </div>
+
+    <div class="p-4 bg-white border-t border-slate-200">
+        <div id="options-container" class="flex flex-wrap gap-2 mb-2"></div>
+        <div class="flex items-center">
+            <input type="text" id="user-input" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Digite sua resposta...">
+            <button id="send-btn" class="ml-3 bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors">
+                Enviar
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/streamlit-component-lib@1.4.0/dist/streamlit-component-lib.js"></script>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const optionsContainer = document.getElementById('options-container');
+
+        let appState = {
+            conversationStep: 'AWAITING_SCALE_NAME',
+            currentScale: {},
+            allScales: [],
+        };
+
+        function addMessage(text, sender = 'bot') {
+            const bubbleClass = sender === 'bot' ? 'chat-bubble-bot' : 'chat-bubble-user';
+            const alignClass = sender === 'bot' ? 'self-start' : 'self-end';
+            const messageEl = document.createElement('div');
+            messageEl.className = `max-w-md md:max-w-lg p-3 rounded-xl mb-3 shadow-sm ${bubbleClass} ${alignClass}`;
+            messageEl.textContent = text;
+            chatContainer.appendChild(messageEl);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            Streamlit.setFrameHeight();
+        }
+        
+        function showOptions(options) {
+            optionsContainer.innerHTML = '';
+            userInput.classList.add('hidden');
+            sendBtn.classList.add('hidden');
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-slate-200 text-slate-700 font-semibold py-1 px-3 rounded-full text-sm hover:bg-slate-300 transition-colors';
+                btn.textContent = opt.label;
+                btn.onclick = () => {
+                    userInput.classList.remove('hidden');
+                    sendBtn.classList.remove('hidden');
+                    addMessage(opt.label, 'user');
+                    handleUserInput(opt.value);
+                    optionsContainer.innerHTML = '';
+                };
+                optionsContainer.appendChild(btn);
+            });
+            Streamlit.setFrameHeight();
+        }
+        
+        function resetCurrentScale() {
+            appState.currentScale = {};
+        }
+
+        function sendDataToStreamlit() {
+            if (appState.allScales.length > 0) {
+                 addMessage("Ok, enviando escalas para processamento final...");
+                 Streamlit.setComponentValue(appState.allScales);
+            } else {
+                 addMessage("Nenhuma escala foi adicionada. Adicione ao menos uma para gerar o arquivo.");
+            }
+        }
+        
+        function handleUserInput(input = null) {
+            const userText = input !== null ? input : userInput.value.trim();
+            if (userText === '' && input === null) return;
+            
+            if (input === null) {
+                 addMessage(userText, 'user');
+            }
+            userInput.value = '';
+
+            switch (appState.conversationStep) {
+                case 'AWAITING_SCALE_NAME':
+                    appState.currentScale.nome_escala = userText;
+                    addMessage("Qual é o código desta escala?");
+                    appState.conversationStep = 'AWAITING_SCALE_CODE';
+                    break;
+                
+                case 'AWAITING_SCALE_CODE':
+                    appState.currentScale.codigo_escala = userText;
+                    addMessage("Qual o tipo da escala?");
+                    showOptions([
+                        { label: 'Semanal', value: 'SEMANAL' },
+                        { label: '12x36', value: '12X36' },
+                    ]);
+                    appState.conversationStep = 'AWAITING_SCALE_TYPE';
+                    break;
+                
+                case 'AWAITING_SCALE_TYPE':
+                    appState.currentScale.tipo_escala = userText;
+                    addMessage("Ok. Por favor, descreva a jornada completa para esta escala. (Ex: SEG a SEX 08:00 as 18:00 e SAB 08:00 as 12:00)");
+                    appState.conversationStep = 'AWAITING_JORNADAS';
+                    break;
+                
+                case 'AWAITING_JORNADAS':
+                    const horarioRegex = /\d{1,2}(:\d{2})?/;
+                    if (!horarioRegex.test(userText)) {
+                         addMessage("Descrição inválida. Use um formato com horários (ex: 'SEG a SEX 08:00 as 18:00'). Vamos tentar de novo.");
+                         return;
+                    }
+                    
+                    appState.currentScale.jornadas = [userText];
+                    appState.allScales.push(appState.currentScale);
+                    
+                    addMessage(`Escala '${appState.currentScale.nome_escala}' adicionada! Deseja cadastrar outra?`);
+                    showOptions([
+                        { label: 'Sim, cadastrar outra', value: 'START_NEW_SCALE' },
+                        { label: 'Não, finalizar e gerar', value: 'GENERATE_JSON' },
+                    ]);
+                    appState.conversationStep = 'AWAITING_SESSION_END';
+                    break;
+                
+                case 'AWAITING_SESSION_END':
+                     if (userText === 'START_NEW_SCALE') {
+                         resetCurrentScale();
+                         addMessage("Vamos para a próxima escala. Qual o nome?");
+                         appState.conversationStep = 'AWAITING_SCALE_NAME';
+
+                     } else if (userText === 'GENERATE_JSON') {
+                         sendDataToStreamlit();
+                     }
+                    break;
+            }
+        }
+
+        sendBtn.addEventListener('click', () => handleUserInput());
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleUserInput();
+        });
+
+        function onStreamlitRender(event) {
+            Streamlit.setFrameHeight();
+        }
+
+        Streamlit.events.addEventListener(Streamlit.RENDER_EVENT, onStreamlitRender);
+        Streamlit.setComponentReady();
+        
+        addMessage("Olá! Estou pronto para te ajudar a criar um novo arquivo de escalas. Vamos cadastrar a primeira. Qual o nome?");
+
+    </script>
+</body>
+</html>

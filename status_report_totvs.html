@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gerador de Status Report – TOTVS RH Orçamento</title>
+<style>
+  /* --- Página e container --- */
+  body { font-family: "Segoe UI", Arial, sans-serif; background:#f5f8fa; margin:0; padding:24px; color:#222; }
+  .wrap { max-width: 1050px; margin: auto; }
+
+  /* --- Cabeçalho do relatório (visual TOTVS) --- */
+  .card { background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin-bottom:18px; }
+  h1 { color:#0063AF; margin:0 0 8px; font-size:20px; }
+  p.lead { margin:6px 0 12px; color:#444; }
+
+  label { display:block; font-weight:600; color:#005f9e; margin-top:10px; }
+  input[type="text"], input[type="date"], select, textarea {
+    width:100%; padding:8px; border:1px solid #d0d7df; border-radius:6px; font-size:14px; box-sizing:border-box;
+    background:#fafafa;
+  }
+  textarea { min-height:72px; resize:vertical; }
+
+  /* --- Projeto/card --- */
+  .project { border:1px solid #e1e7ee; border-radius:10px; padding:14px; margin-bottom:14px; background:#fff; position: relative; }
+  .project h3 { margin:0 0 8px; color:#004a87; font-size:16px; }
+  
+  /* Botão excluir dentro do card */
+  .btn-delete-proj {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: #ffeded;
+    color: #cc0000;
+    border: 1px solid #ffc9c9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn-delete-proj:hover { background: #ffc9c9; }
+
+  /* --- estilo das seções do status gerado --- */
+  .status-block { font-family: "Segoe UI", Arial, sans-serif; background:#fff; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 0 10px rgba(0,0,0,0.06); }
+  .status-title { color:#0063AF; text-align:center; margin:0 0 6px; font-size:18px; }
+  .status-dates { text-align:center; color:#555; margin:0 0 12px; font-size:13px; }
+  .sep { border:none; border-top:2px solid #0063AF; margin:14px 0; }
+  .section-title { color:#0063AF; margin:12px 0 6px; font-size:15px; }
+
+  .table-email { border-collapse:collapse; width:100%; table-layout:fixed; font-family: Arial, sans-serif; font-size:13px; }
+  .table-email th, .table-email td { border:1px solid #999; padding:8px; vertical-align:top; word-wrap:break-word; }
+  .table-email thead th { background:#f2f2f2; font-weight:700; }
+
+  /* --- botões flutuantes --- */
+  .float-panel { position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; gap:10px; z-index:9999; }
+  .float-panel button { background:#0063AF; color:#fff; border:none; padding:10px 14px; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.12); cursor:pointer; font-size:14px; min-width:180px; }
+  .float-panel button.secondary { background:#0b6fb1; }
+  .float-panel button.warn { background:#d06b00; }
+  .float-panel button.ghost { background:#3b82c4; opacity:0.95; }
+
+  @media (max-width:720px){ .float-panel button { min-width:140px; font-size:13px; padding:8px 10px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>📌 Resumo Executivo</h1>
+      <p class="lead"><strong>Boa noite!</strong></p>
+      <p class="lead">Segue status semanal conforme andamento dos projetos abaixo:</p>
+      <div id="visaoConsolidadaPlaceholder"></div> 
+      <hr style="border:none; border-top:1px solid #e1e7ee; margin:16px 0;">
+      <label for="msgGeral">Mensagem Geral (fixa para todos os projetos)</label>
+      <textarea id="msgGeral" placeholder="Ex: As melhorias informadas ao cliente Moura são evoluções que podem impactar outros clientes..."></textarea>
+    </div>
+    <div id="projetosContainer"></div>
+  </div>
+
+  <div class="float-panel">
+    <button id="btnGerar" onclick="gerarStatus()">Gerar Status</button>
+    <button id="btnCopiar" class="secondary" onclick="copiarComFormatacao()">Copiar (com formatação)</button>
+    <button id="btnSalvar" class="ghost" onclick="salvarDados()">Salvar</button>
+    <button id="btnCarregar" class="warn" onclick="carregarDados()">Carregar</button>
+  </div>
+
+<script>
+const total = 10;
+const projetosContainer = document.getElementById('projetosContainer');
+
+for (let i=1; i<=total; i++){
+  projetosContainer.insertAdjacentHTML('beforeend', `
+  <div class="project" id="proj-${i}">
+    <h3>Cliente ${i}</h3>
+    <button type="button" class="btn-delete-proj" onclick="excluirProjeto(${i})">Excluir Projeto</button>
+
+    <label>Nome do Cliente</label>
+    <input type="text" id="cliente-${i}" placeholder="Nome do cliente">
+
+    <label>Data de Início</label>
+    <input type="date" id="inicio-${i}">
+
+    <label>Previsão de Go-Live</label>
+    <input type="date" id="golive-${i}" onchange="registrarAlteracaoGoLive(${i}, event)" data-previous-value="">
+    <input type="hidden" id="golive-hist-${i}" value="">
+    
+    <button type="button" onclick="limparHistoricoGoLive(${i})" style="margin-top:4px; padding:4px 8px; border:1px solid #d0d7df; border-radius:4px; font-size:12px; background:#f0f0f0; cursor:pointer;">
+        Limpar Histórico de Datas
+    </button>
+    
+    <label>Status Atual</label>
+    <div style="margin-top:6px;">
+      <button type="button" onclick="setStatus(${i}, '🟢 No prazo')" style="border-radius:20px;padding:6px 10px;margin-right:6px;background:#c8f7c5;border:1px solid #bfe8b3;">🟢</button>
+      <button type="button" onclick="setStatus(${i}, '🟡 Atenção')" style="border-radius:20px;padding:6px 10px;margin-right:6px;background:#fff7b1;border:1px solid #ffeaa1;">🟡</button>
+      <button type="button" onclick="setStatus(${i}, '🔴 Crítico')" style="border-radius:20px;padding:6px 10px;background:#ffc9c9;border:1px solid #f4baba;">🔴</button>
+      <button type="button" onclick="setStatus(${i}, '⚪ Não iniciado')" style="border-radius:20px;padding:6px 10px;margin-right:6px;background:#ddd;border:1px solid #ccc;color:#666;">⚪</button>
+    </div>
+    <input type="text" id="status-${i}" placeholder="Selecione ou edite o status" style="margin-top:8px;">
+
+    <label>Resumo do Status (Observações/Destaque)</label>
+    <textarea id="resumo-${i}" placeholder="Situação atual do projeto"></textarea>
+    
+    <fieldset id="acoes-fieldset-${i}" disabled style="border:1px solid #e1e7ee; padding:10px; border-radius:6px; margin-top:10px;">
+        <legend style="font-weight:600; color:#005f9e;">Ações para Desvio de Prazo</legend>
+        <label for="acoes-${i}" style="margin-top:0;">Ação:</label>
+        <textarea id="acoes-${i}" placeholder="Ação necessária para resolver o desvio ou risco"></textarea>
+        <label for="prazoAcoes-${i}">Prazo:</label>
+        <input type="date" id="prazoAcoes-${i}">
+    </fieldset>
+
+    <label>Entregas Realizadas (Etapa | Responsável | Deadline)</label>
+    <textarea id="entregas-${i}" placeholder="Ex: Passagem de bastão | TOTVS & Cliente | 05/11/2025"></textarea>
+
+    <label>Próximos Passos (Etapa | Responsável | Deadline)</label>
+    <textarea id="proximos-${i}" placeholder="Ex: Kickoff | TOTVS & Cliente | 17/11/2025"></textarea>
+  </div>
+  `);
+}
+
+/* --- FUNÇÃO EXCLUIR PROJETO --- */
+function excluirProjeto(i) {
+  if (!confirm(`Tem certeza que deseja zerar os dados do Cliente ${i}?`)) return;
+  
+  // Limpa todos os campos de texto e data
+  document.getElementById(`cliente-${i}`).value = '';
+  document.getElementById(`inicio-${i}`).value = '';
+  document.getElementById(`golive-${i}`).value = '';
+  document.getElementById(`golive-${i}`).dataset.previousValue = '';
+  document.getElementById(`golive-hist-${i}`).value = '';
+  document.getElementById(`resumo-${i}`).value = '';
+  document.getElementById(`acoes-${i}`).value = '';
+  document.getElementById(`prazoAcoes-${i}`).value = '';
+  document.getElementById(`entregas-${i}`).value = '';
+  document.getElementById(`proximos-${i}`).value = '';
+  
+  // Reseta o status para o padrão e desabilita o fieldset de ações
+  setStatus(i, '⚪ Não iniciado');
+  
+  alert(`Dados do Cliente ${i} foram removidos.`);
+}
+
+function setStatus(i, texto){ 
+    document.getElementById(`status-${i}`).value = texto; 
+    const fieldset = document.getElementById(`acoes-fieldset-${i}`);
+    const isRisco = texto.includes('🟡') || texto.includes('🔴');
+    if (fieldset) {
+        fieldset.disabled = !isRisco;
+        if (!isRisco) {
+            document.getElementById(`acoes-${i}`).value = '';
+            document.getElementById(`prazoAcoes-${i}`).value = '';
+        }
+    }
+}
+
+function formatDateBR(v){ 
+    if(!v) return 'Pendente'; 
+    const d = new Date(v + 'T00:00:00'); 
+    if (isNaN(d)) return v;
+    return d.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+}
+
+function limparHistoricoGoLive(i) {
+    const campoHistorico = document.getElementById(`golive-hist-${i}`);
+    if (campoHistorico) { campoHistorico.value = ''; alert(`Histórico de datas do Cliente ${i} limpo.`); }
+}
+
+function getStatusDescription(status) {
+    const cleanedStatus = status.trim();
+    if (cleanedStatus.includes('🟢')) return {description: '🟢 No prazo / Dentro do escopo / Sem riscos relevantes', shortText: 'No prazo', color: 'green', ordem: 1};
+    if (cleanedStatus.includes('🟡')) return {description: '🟡 Atenção / Atraso / Pequeno desvio', shortText: 'Atenção', color: '#d06b00', ordem: 2};
+    if (cleanedStatus.includes('🔴')) return {description: '🔴 Crítico / Atrasado / Fora do escopo ou custo', shortText: 'Crítico', color: '#a94442', ordem: 3};
+    return {description: '⚪ Não iniciado / Pendente de kickoff / Aguardando briefing', shortText: 'Não iniciado', color: '#999', ordem: 4};
+}
+
+function getProjetosOrdenados(projetos) {
+    const ordemPrioridade = { '🔴 Crítico': 4, '🟡 Atenção': 3, '🟢 No prazo': 2, '⚪ Não iniciado': 1 };
+    const projetosComOrdem = projetos.filter(p => p.cliente).map(p => {
+        const icon = p.status.split(' ')[0];
+        const text = p.status.split(' ')[1];
+        const key = icon + ' ' + (text || '');
+        let peso = 0;
+        for (let k in ordemPrioridade) { if (p.status.includes(k)) peso = ordemPrioridade[k]; }
+        return { ...p, peso: peso };
+    });
+    projetosComOrdem.sort((a, b) => b.peso - a.peso);
+    return projetosComOrdem;
+}
+
+function registrarAlteracaoGoLive(i, event) {
+  const inputData = event.target;
+  const novaData = inputData.value;
+  const campoHistorico = document.getElementById(`golive-hist-${i}`);
+  let historico = campoHistorico.value.trim();
+  const dataAntiga = inputData.dataset.previousValue;
+  if (dataAntiga && dataAntiga !== novaData) {
+    const dataAntigaFormatada = formatDateBR(dataAntiga);
+    const novoItemHistorico = `~~${dataAntigaFormatada}~~`;
+    if (!historico.includes(dataAntigaFormatada)) { historico += (historico ? ', ' : '') + novoItemHistorico; }
+    campoHistorico.value = historico;
+  }
+  inputData.dataset.previousValue = novaData;
+}
+
+function montarTabelaTexto(texto){
+  const linhas = texto.split('\n').map(l => l.trim()).filter(l => l !== '');
+  if (linhas.length === 0) return `<p style="color:#666;"><em>Nenhum item informado.</em></p>`;
+  let t = `<table class="table-email" style="border-collapse:collapse;width:100%;table-layout:fixed;font-family:Arial;font-size:13px;">
+    <thead><tr>
+      <th style="width:50%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Etapa</th>
+      <th style="width:30%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Responsável</th>
+      <th style="width:20%;text-align:left;padding:8px;border:1px solid #999;background:#f2f2f2;">Deadline</th>
+    </tr></thead><tbody>`;
+  linhas.forEach(l => {
+    if (l.includes('|')) {
+      const cols = l.split('|').map(c => escapeHtml(c.trim()));
+      t += `<tr><td style="border:1px solid #999;padding:8px;">${cols[0]||''}</td><td style="border:1px solid #999;padding:8px;">${cols[1]||''}</td><td style="border:1px solid #999;padding:8px;">${cols[2]||''}</td></tr>`;
+    } else {
+      t += `<tr><td colspan="3" style="border:1px solid #999;padding:8px;">${escapeHtml(l)}</td></tr>`;
+    }
+  });
+  t += `</tbody></table>`;
+  return t;
+}
+
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function construirLegendaStatus() {
+    const statusKeys = ['🔴 Crítico', '🟡 Atenção', '🟢 No prazo', '⚪ Não iniciado'];
+    let html = `<div style="margin-top:20px; padding:15px; border:1px solid #ddd; border-radius:8px; background:#f9f9f9;">`;
+    html += `<h3 style="color:#004a87; margin:0 0 10px; font-size:15px;">Legenda de Status do Projeto</h3>`;
+    html += `<ul style="list-style:none; padding:0; margin:0; line-height:1.6;">`;
+    statusKeys.forEach(status => {
+        const statusData = getStatusDescription(status);
+        const parts = statusData.description.split('/');
+        const iconAndMain = parts[0].trim();
+        const details = parts.slice(1).map(s => s.trim()).join(' / ');
+        html += `<li style="margin-bottom:4px;"><span style="font-weight:bold; color:${statusData.color};">${iconAndMain}</span>: ${details}</li>`;
+    });
+    html += `</ul></div>`;
+    return html;
+}
+
+function gerarStatus(){
+  let resumoTabelaHtml = ''; 
+  let detalhesHtml = '';
+  let html = ''; 
+  const projetos = []; 
+
+  for (let i=1;i<=total;i++){
+    const cliente = document.getElementById(`cliente-${i}`).value.trim();
+    if (!cliente) continue;
+    projetos.push({
+      cliente,
+      inicio: document.getElementById(`inicio-${i}`).value,
+      golive: document.getElementById(`golive-${i}`).value,
+      goliveHist: document.getElementById(`golive-hist-${i}`).value.trim(),
+      status: document.getElementById(`status-${i}`).value.trim(),
+      resumo: document.getElementById(`resumo-${i}`).value.trim(),
+      acoes: document.getElementById(`acoes-${i}`).value.trim(), 
+      prazoAcoes: document.getElementById(`prazoAcoes-${i}`).value, 
+      entregas: document.getElementById(`entregas-${i}`).value.trim(),
+      proximos: document.getElementById(`proximos-${i}`).value.trim()
+    });
+  }
+  
+  const projetosOrdenados = getProjetosOrdenados(projetos);
+  const msgGeral = document.getElementById('msgGeral').value.trim();
+
+  resumoTabelaHtml += `<h2 style="color:#0063AF; margin:24px 0 10px; font-size:18px;">Resumo Executivo (por Projeto)</h2>`;
+  resumoTabelaHtml += `<table style="border-collapse:collapse;width:100%;table-layout:fixed;font-family:Arial;font-size:13px; margin-bottom: 20px;">`;
+  resumoTabelaHtml += `<thead><tr><th style="width:18%; text-align:left; padding:8px; border:1px solid #999; background:#f2f2f2;">Cliente</th><th style="width:12%; text-align:left; padding:8px; border:1px solid #999; background:#f2f2f2;">Status</th><th style="width:35%; text-align:left; padding:8px; border:1px solid #999; background:#f2f2f2;">Observações</th><th style="width:25%; text-align:left; padding:8px; border:1px solid #999; background:#f2f2f2;">Ações</th><th style="width:10%; text-align:left; padding:8px; border:1px solid #999; background:#f2f2f2;">Prazo</th></tr></thead><tbody>`;
+
+  projetosOrdenados.forEach(p => {
+    const statusData = getStatusDescription(p.status);
+    const anchorId = escapeHtml(p.cliente.replace(/[^a-zA-Z0-9]/g, ''));
+    resumoTabelaHtml += `<tr><td style="border:1px solid #999;padding:8px;"><a href="#detalhe-${anchorId}" style="color:#0063AF; text-decoration:none;">${escapeHtml(p.cliente)}</a></td><td style="border:1px solid #999;padding:8px;"><span style="color:${statusData.color}; font-weight:bold;">${escapeHtml(p.status)}</span></td><td style="border:1px solid #999;padding:8px;">${p.resumo ? escapeHtml(p.resumo.split('\n')[0]) : '—'}</td><td style="border:1px solid #999;padding:8px;">${p.acoes ? escapeHtml(p.acoes.split('\n')[0]) : '—'}</td><td style="border:1px solid #999;padding:8px;">${p.prazoAcoes ? formatDateBR(p.prazoAcoes) : '—'}</td></tr>`;
+
+    let bloco_completo = `<div id="detalhe-${anchorId}" class="status-block" style="background:#fff;padding:18px;border-radius:10px;margin-bottom:16px;">`;
+    bloco_completo += `<h2 style="color:#0063AF;text-align:center;margin:0 0 6px;">${escapeHtml(p.status)} – ${escapeHtml(p.cliente)}</h2>`;
+    let goLiveDisplay = `<strong>${formatDateBR(p.golive)}</strong>`;
+    if (p.goliveHist) { goLiveDisplay = `${p.goliveHist.replace(/~~(.*?)~~/g, '<del style="color:#a94442;text-decoration:line-through;margin-right:4px;">$1</del>')} ➔ ${goLiveDisplay}`; }
+    bloco_completo += `<p style="text-align:center;color:#666;margin:0 0 12px;">Data de Início: <strong>${formatDateBR(p.inicio)}</strong> | Go-Live: ${goLiveDisplay}</p>`;
+    bloco_completo += `<hr style="border:none;border-top:2px solid #0063AF;margin:14px 0;">`;
+    bloco_completo += `<h3 class="section-title">1. Resumo Executivo (Observações)</h3><div style="border:1px solid #ddd;padding:12px;border-radius:8px;background:#fafafa;margin-bottom:10px;">${p.resumo ? escapeHtml(p.resumo).replace(/\n/g,'<br>') : '<em>Sem descrição.</em>'}</div>`;
+    bloco_completo += `<h3 class="section-title">2. Entregas Realizadas</h3>${montarTabelaTexto(p.entregas)}`;
+    bloco_completo += `<h3 class="section-title">3. Próximos Passos</h3>${montarTabelaTexto(p.proximos)}</div>`;
+    detalhesHtml += bloco_completo;
+  });
+  resumoTabelaHtml += `</tbody></table>`;
+
+  html = `<div style="font-family: 'Segoe UI', Arial, sans-serif;"><h1 style="color:#0063AF;margin-bottom:6px;">📌 Status Report Semanal</h1><p><strong>Boa noite!</strong></p><p>Segue status semanal conforme andamento dos projetos abaixo:</p>${construirLegendaStatus()}`;
+  if (msgGeral) html += `<hr style="border:none;border-top:1px dashed #ddd;margin:18px 0;"><p style="color:#333;">${escapeHtml(msgGeral)}</p>`;
+  html += `<hr style="border:none;border-top:1px dashed #ddd;margin:12px 0 18px;">${resumoTabelaHtml}`;
+  if (detalhesHtml) html += `<h1 style="color:#0063AF;margin:24px 0 10px;">📋 Detalhes dos Projetos</h1><hr style="border:none;border-top:3px solid #0063AF;margin:12px 0 20px;">${detalhesHtml}`;
+  html += `</div>`; 
+
+  let resultado = document.getElementById('__resultado_status') || document.createElement('div');
+  resultado.id = '__resultado_status'; resultado.style.display = 'none'; document.body.appendChild(resultado);
+  resultado.innerHTML = html;
+  localStorage.setItem('ultimoStatusGerado', JSON.stringify({html, timestamp: new Date().toISOString()}));
+  alert('✅ Status gerado. Clique em "Copiar" para finalizar.');
+}
+
+async function copiarComFormatacao(){
+  const resultado = document.getElementById('__resultado_status');
+  if (!resultado) return alert('⚠️ Gere o status primeiro.');
+  const html = resultado.innerHTML;
+  if (navigator.clipboard && window.ClipboardItem) {
+    try {
+      const data = [ new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) }) ];
+      await navigator.clipboard.write(data); alert('✅ Copiado!'); return;
+    } catch (e) { console.warn(e); }
+  }
+  const temp = document.createElement('div'); temp.style.position = 'fixed'; temp.style.left = '-9999px'; temp.setAttribute('contenteditable', 'true');
+  temp.innerHTML = html; document.body.appendChild(temp);
+  const range = document.createRange(); range.selectNodeContents(temp);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  document.execCommand('copy'); document.body.removeChild(temp);
+  alert('✅ Copiado (fallback)!');
+}
+
+function salvarDados(){
+  const dados = { mensagemGeral: document.getElementById('msgGeral').value, projetos: [] };
+  for (let i=1;i<=total;i++){
+    dados.projetos.push({
+      cliente: document.getElementById(`cliente-${i}`).value,
+      inicio: document.getElementById(`inicio-${i}`).value,
+      golive: document.getElementById(`golive-${i}`).value,
+      goliveHist: document.getElementById(`golive-hist-${i}`).value,
+      status: document.getElementById(`status-${i}`).value,
+      resumo: document.getElementById(`resumo-${i}`).value,
+      acoes: document.getElementById(`acoes-${i}`).value, 
+      prazoAcoes: document.getElementById(`prazoAcoes-${i}`).value, 
+      entregas: document.getElementById(`entregas-${i}`).value,
+      proximos: document.getElementById(`proximos-${i}`).value
+    });
+  }
+  localStorage.setItem('statusReport_draft', JSON.stringify(dados));
+  alert('💾 Salvo!');
+}
+
+function carregarDados(){
+  const raw = localStorage.getItem('statusReport_draft');
+  if (!raw) return alert('⚠️ Nada salvo.');
+  const parsed = JSON.parse(raw);
+  document.getElementById('msgGeral').value = parsed.mensagemGeral || '';
+  parsed.projetos.forEach((p, idx) => {
+    const i = idx+1;
+    if (document.getElementById(`cliente-${i}`)) {
+      document.getElementById(`cliente-${i}`).value = p.cliente || '';
+      document.getElementById(`inicio-${i}`).value = p.inicio || '';
+      document.getElementById(`golive-${i}`).value = p.golive || '';
+      document.getElementById(`golive-hist-${i}`).value = p.goliveHist || '';
+      document.getElementById(`status-${i}`).value = p.status || '';
+      document.getElementById(`resumo-${i}`).value = p.resumo || '';
+      document.getElementById(`acoes-${i}`).value = p.acoes || ''; 
+      document.getElementById(`prazoAcoes-${i}`).value = p.prazoAcoes || ''; 
+      document.getElementById(`entregas-${i}`).value = p.entregas || '';
+      document.getElementById(`proximos-${i}`).value = p.proximos || '';
+      document.getElementById(`golive-${i}`).dataset.previousValue = p.golive || '';
+      const isRisco = p.status && (p.status.includes('🟡') || p.status.includes('🔴'));
+      document.getElementById(`acoes-fieldset-${i}`).disabled = !isRisco;
+    }
+  });
+  alert('📂 Carregado!');
+}
+
+window.addEventListener('load', carregarDados);
+</script>
+</body>
+</html>

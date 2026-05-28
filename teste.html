@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workbook PontoWEB - Fundação Educacional Severino Sombra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fb; }
+        .container { max-width: 900px; }
+        .section-header { background-color: #3498db; color: white; padding: 12px; border-radius: 8px 8px 0 0; font-weight: 700; font-size: 1.125rem; }
+        table { border-radius: 8px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
+        th { background-color: #f0f4f8; color: #2c3e50; font-weight: 600; }
+        td { background-color: white; color: #34495e; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e0e6ed; }
+        .card { background-color: white; border-radius: 12px; padding: 20px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6 border-b-4 border-blue-500 pb-2">Workbook PontoWEB - Gestão de Time</h1>
+        <h2 class="text-xl font-medium text-center text-gray-600 mb-8">Fundação Educacional Severino Sombra</h2>
+
+        <!-- SEÇÃO 1: Contexto e Objetivos -->
+        <div class="mb-8">
+            <div class="section-header">1. Contexto e Objetivos</div>
+
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Objetivo do Projeto</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-1/3">Objetivo</th>
+                            <th>Detalhes da Fundação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>**Ganhos de Eficiência (Principal Objetivo)**</td>
+                            <td>O foco primário é obter **Ganhos de tempo no fechamento do ponto**.</td>
+                        </tr>
+                        <tr>
+                            <td>Redução de Riscos/Custos e Tomada de Decisão RH</td>
+                            <td>Não especificado (N/A).</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">Benefícios Esperados</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="w-1/3">Benefício</th>
+                            <th>Detalhes da Fundação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>**Alertas Cruciais**</td>
+                            <td>Serão configurados alertas para **horas extras** e **sobreaviso** para gestão em tempo real.</td>
+                        </tr>
+                        <tr>
+                            <td>Segurança Jurídica/Transparência</td>
+                            <td>Atingida por meio de **registros** e **compliance com relatórios legais**.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SEÇÃO 2: Processos e Autosserviço -->
+        <div class="mb-8">
+            <div class="section-header">2. Processos e Autosserviço</div>
+
+            <div class="card">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">1.1 Perfis de Acesso</h3>
+                <ul class="list-disc ml-5 text-gray-700">
+                    <li>**Perfis Padrão Utilizados:** **RH**, **DP** (Departamento Pessoal) e **Administrador**.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.2 Dados de Funcionários</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr><th>Tema</th><th>Deliberação da Fundação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>**Fonte da Verdade (Sistema Mandatório)**</td><td>**A Definir** (N/A).</td></tr>
+                        <tr><td>Habilitação Nome Social</td><td>**A Definir** (N/A).</td></tr>
+                        <tr><td>**Geração de Senhas**</td><td>**Automática**, com a senha inicial padrão **12345**.</td></tr>
+                        <tr><td>Biometrias/Regras Sindicais</td><td>**A Definir**.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.3 Escala/Horário</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr><th>Tema</th><th>Deliberação da Fundação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>**Tipos de Horas Adicionais**</td><td>Horas Extras **50%**, **60%** e **100%**. **Adicional Noturno** (20%) e **Banco de Horas**.</td></tr>
+                        <tr><td>**Regra Professores (Corpo Docente)**</td><td>Jornada de **4 horas de aula**, com **15 minutos de intervalo** a cada hora/aula.</td></tr>
+                        <tr><td>Regra Médicos</td><td>Escala de **12x36**.</td></tr>
+                        <tr><td>Gestão de Folgas (DSR)</td><td>Segue o **Padrão da Escala**, sendo o **domingo** o dia padrão de folga.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.4 Regras Sindicais</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr><th>Tema</th><th>Deliberação da Fundação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>**Modelo de Banco de Horas**</td><td>**Ciclo Fechado**, com quitação de saldos utilizando o critério **Padrão Múltiplos Saldos**.</td></tr>
+                        <tr><td>Tolerância de Atrasos/Saídas</td><td>**10 minutos** (para cargas positivas e negativas).</td></tr>
+                        <tr><td>Batidas Duplicadas</td><td>**Não** será configurada restrição de intervalo.</td></tr>
+                        <tr><td>Adicional Noturno</td><td>**Padrão** (22h00 às 05h00, 20% de adicional, hora reduzida).</td></tr>
+                        <tr><td>DSR (Descanso Semanal Remunerado)</td><td>O cálculo do reflexo/valor será feito no **Sistema de Folha** (PontoWEB apenas fornece a frequência).</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.5 Tratativa de Ponto</h3>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr><th>Tema</th><th>Deliberação da Fundação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>**Mês Contábil (Período Apuração)**</td><td>De **21** (início) a **20** (fim) de cada mês.</td></tr>
+                        <tr><td>Prazo de Envio para Folha</td><td>**5 dias** após o fechamento do mês contábil.</td></tr>
+                        <tr><td>**Fluxograma de Tratamento**</td><td>**Início da Apuração:** DP. **Inclusão/Exclusão de Registros:** DP e Funcionário. **Aprovação de Batidas/Justificativas:** Gestor Imediato.</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.6 Solicitação de Justificativas (Autosserviço)</h3>
+                <ul class="list-disc ml-5 text-gray-700">
+                    <li>**Fluxo de Aprovação Geral:** **Gestor imediato**.</li>
+                    <li>Anexo em Abonos: **N/A** (Não será exigido o anexo, por enquanto).</li>
+                    <li>Abonos Médicos (> 15 dias): Aprovação pelo **RH**.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.7 Bloqueio de Alterações/Competência</h3>
+                <ul class="list-disc ml-5 text-gray-700">
+                    <li>**Perfil Responsável:** **DP** (Departamento Pessoal).</li>
+                    <li>**Efeito do Bloqueio:** As alterações feitas após o bloqueio **Não surtem efeito** no período fechado.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.8 Aceite Digital de Espelho de Ponto</h3>
+                <ul class="list-disc ml-5 text-gray-700">
+                    <li>**Ação de Bloqueio:** O próprio **Aceite Digital** do espelho pelo colaborador é a ação que efetuará o **Bloqueio de Competência**.</li>
+                    <li>**Controle de Reabertura:** A função **"reabrir espelho"** é controlada pelo **DP**.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">1.13 Gestão de Dispositivos de Marcações</h3>
+                <ul class="list-disc ml-5 text-gray-700">
+                    <li>**Métodos de Registro:** Serão utilizados os **3 padrões** (Batida Online, Ahgora Multi, e outros, como o REP).</li>
+                    <li>Batida Online: **Sim**, será utilizada.</li>
+                    <li>Segurança Ahgora Multi: Será habilitado o sistema **Liveness** no reconhecimento facial.</li>
+                    <li>Geolocalização: **Sim**, será utilizada.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2 mt-6">Regras Adicionais e Relatórios</h3>
+                
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr><th>Tema</th><th>Deliberação da Fundação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="2" class="text-center font-semibold bg-gray-50">1.10 Regras de Pagamento</td></tr>
+                        <tr><td>**Integração Folha**</td><td>**Integração nativa** (para envio de horas adicionais).</td></tr>
+                        <tr><td>Rubricas Mapeadas</td><td>**1001, 1002, 1003, 1004, 1005**.</td></tr>
+                        
+                        <tr><td colspan="2" class="text-center font-semibold bg-gray-50 mt-4">1.9 Norma Regulamentadora - NR 17</td></tr>
+                        <tr><td>**Utilização NR 17**</td><td>**Nenhuma** regra de controle relacionada à NR 17 será utilizada.</td></tr>
+
+                        <tr><td colspan="2" class="text-center font-semibold bg-gray-50 mt-4">1.11 Relatórios</td></tr>
+                        <tr><td>Perfis com Acesso</td><td>**Gestores** e **DP**.</td></tr>
+                        <tr><td>Filtro Primário</td><td>**Departamento**.</td></tr>
+
+                        <tr><td colspan="2" class="text-center font-semibold bg-gray-50 mt-4">1.12 Alertas Agendados</td></tr>
+                        <tr><td>**Alertas Prioritários**</td><td>**Horas Extras** e **Faltas**.</td></tr>
+                        <tr><td>Periodicidade de Envio</td><td>**Diário**.</td></tr>
+                        <tr><td>Agendamento de Relatórios</td><td>**Sim**, a funcionalidade de envio automático será utilizada.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

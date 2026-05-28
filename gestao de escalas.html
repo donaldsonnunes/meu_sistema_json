@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação do Sistema de Gestão de Escalas</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.6;
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #ffffff; /* Fundo branco */
+            color: #212529; /* Cor do texto principal (escuro) */
+        }
+        h1, h2, h3, h4 {
+            color: #000000; /* Títulos em preto */
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        p, li {
+            color: #343a40; /* Cor do parágrafo (escuro) */
+        }
+        code {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            color: #664d03;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Documentação do Sistema de Gestão de Escalas</h1>
+
+    <h2>1. Introdução</h2>
+    <p>O <b>Sistema de Gestão de Escalas</b> é uma aplicação web desenvolvida em Python com a biblioteca Streamlit, projetada para facilitar a importação, edição, análise e exportação de dados de escalas de trabalho, jornadas e horas adicionais contidas em arquivos JSON.</p>
+    <p>A ferramenta centraliza os dados em um banco de dados local (<code>database.db</code>) e oferece uma interface gráfica intuitiva para realizar operações complexas de forma simples e segura.</p>
+
+    <h2>2. Visão Geral da Interface</h2>
+    <p>A interface é dividida em duas áreas principais:</p>
+    <ul>
+        <li><b>Menu Lateral (Sidebar):</b> Localizado à esquerda, contém a lista de todas as funcionalidades disponíveis no sistema. A navegação é feita selecionando a opção desejada.</li>
+        <li><b>Área de Conteúdo Principal:</b> Onde as funcionalidades selecionadas são exibidas e utilizadas.</li>
+    </ul>
+
+    <h2>3. Guia de Funcionalidades (Menu)</h2>
+    <p>A seguir, um detalhamento de cada item do menu.</p>
+
+    <h4>📥 <b>Importar Escala</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Permite carregar um ou mais arquivos no formato <code>.json</code> para dentro do sistema.</li>
+        <li><b>Como usar:</b> Clique no botão "Browse files" ou arraste os arquivos JSON para a área designada. O sistema processará cada arquivo e os salvará no banco de dados.</li>
+    </ul>
+
+    <h4>✏️ <b>Editar JSON</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Permite editar um valor específico dentro de qualquer arquivo JSON já importado.</li>
+        <li><b>Como usar:</b>
+            <ol>
+                <li>Selecione o arquivo JSON que deseja editar.</li>
+                <li>Escolha o tipo de entidade: "Escala", "Jornada" ou "Hora Adicional".</li>
+                <li>Selecione o item específico pelo nome.</li>
+                <li>Escolha a "tag" (o campo) que deseja alterar.</li>
+                <li>Digite o novo valor e clique em "Salvar agora".</li>
+            </ol>
+        </li>
+    </ul>
+
+    <h4>🧩 <b>Exportar JSON Personalizado</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Cria um novo arquivo JSON customizado, contendo apenas as escalas que você selecionar.</li>
+    </ul>
+
+    <h4>🔎 <b>Substituição em Lote</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Ferramenta para encontrar e substituir textos em um campo específico de múltiplas escalas, criando novas cópias das escalas alteradas.</li>
+    </ul>
+
+    <h4>🔗 <b>Unificação de Jornadas</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Ajuda a limpar a base de dados encontrando e unificando jornadas de trabalho com nomes duplicados ou muito semelhantes.</li>
+    </ul>
+
+    <h4>📥 <b>Importar Lista de Escalas (TXT)</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Permite gerar um JSON personalizado a partir de uma simples lista de nomes de escalas contida em um arquivo <code>.txt</code>.</li>
+    </ul>
+
+    <h4>🧹 <b>Saneamento de Nomes de Escalas</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Aplica um conjunto de regras de padronização para corrigir e normalizar os nomes de todas as escalas.</li>
+    </ul>
+
+    <h4>🗑️ <b>Excluir Arquivo</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Remove permanentemente um arquivo JSON do sistema. <p class="note"><b>Atenção:</b> esta ação não pode ser desfeita.</p></li>
+    </ul>
+
+    <h4>📁 <b>Exportar Lista de Arquivos e Escalas</b></h4>
+    <ul>
+        <li><b>O que faz:</b> Gera um relatório <code>.csv</code> que lista todos os arquivos e as escalas contidas em cada um.</li>
+    </ul>
+
+ 
+
+</body>
+</html>

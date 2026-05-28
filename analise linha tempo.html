@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Explicador de Apuração de Ponto</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+.upload {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.employee {
+  padding: 15px;
+}
+
+.day-header {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 6px solid #1976d2;
+}
+
+.day-header:hover {
+  background: #eef2f7;
+}
+
+.day-summary {
+  font-size: 14px;
+  color: #555;
+}
+
+.toggle {
+  font-size: 18px;
+}
+
+.day-content {
+  display: none;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.timeline {
+  margin-top: 10px;
+  border-left: 3px dashed #bbb;
+  padding-left: 15px;
+}
+
+.event {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  background: #eef2f7;
+}
+
+.shift {
+  border-left: 5px solid #1976d2;
+}
+
+.nightly {
+  border-left: 5px solid #6a1b9a;
+  background: #f3e5f5;
+}
+
+.explain {
+  background: #fff8e1;
+  border-left: 5px solid #ffb300;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #e0e0e0;
+  margin-right: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🧾 Explicador de Apuração de Ponto</h1>
+
+<div class="upload">
+  <input type="file" id="fileInput" accept=".json">
+</div>
+
+<div id="content"></div>
+
+<script>
+/* ==============================
+   DICIONÁRIOS DE TRADUÇÃO
+================================ */
+
+const TYPE_TRANSLATION = {
+  shift: "Período de Jornada",
+  nightly: "Período Noturno",
+  punches: "Marcações de Ponto",
+  leaves: "Afastamento / Ausência",
+  extra: "Hora Extra"
+};
+
+const DAY_TYPE_TRANSLATION = {
+  DAY_OFF: "Folga",
+  WORK_DAY: "Dia de Trabalho",
+  HOLIDAY: "Feriado",
+  ABSENCE: "Ausência"
+};
+
+const HOUR_TYPE_TRANSLATION = {
+  "Banco de Horas": "Banco de Horas",
+  "Hora Normal": "Hora Normal",
+  "Hora Noturna": "Hora Noturna"
+};
+
+function translate(map, value) {
+  return map[value] || value;
+}
+
+/* ==============================
+   UPLOAD DO ARQUIVO
+================================ */
+
+const content = document.getElementById('content');
+document.getElementById('fileInput').addEventListener('change', e => {
+  const reader = new FileReader();
+  reader.onload = () => render(JSON.parse(reader.result));
+  reader.readAsText(e.target.files[0]);
+});
+
+/* ==============================
+   TOGGLE DE EXPANSÃO
+================================ */
+
+function toggle(el) {
+  const content = el.nextElementSibling;
+  const icon = el.querySelector('.toggle');
+  const open = content.style.display === 'block';
+  content.style.display = open ? 'none' : 'block';
+  icon.textContent = open ? '▶' : '▼';
+}
+
+/* ==============================
+   RENDERIZAÇÃO
+================================ */
+
+function render(data) {
+  content.innerHTML = '';
+
+  // Cabeçalho funcionário
+  content.innerHTML += `
+    <div class="card employee">
+      <strong>${data.employee.nome}</strong><br>
+      Matrícula: ${data.employee.matricula}<br>
+      Cargo: ${data.employee.cargo}<br>
+      Período: ${data.period}
+    </div>
+  `;
+
+  data.daysInfos.forEach(day => {
+    const expected = day.events.expectedWorkedHours / 3600;
+    const hourTypes = new Set();
+    let hasNight = false;
+
+    day.timeline.forEach(t => {
+      hourTypes.add(
+        translate(
+          HOUR_TYPE_TRANSLATION,
+          t.options?.shift?.DESC_TIPO_HORA || 'Hora padrão'
+        )
+      );
+      if (t.type.includes('nightly')) hasNight = true;
+    });
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="day-header" onclick="toggle(this)">
+        <div>
+          <strong>📅 ${day.dia}</strong>
+          <div class="day-summary">
+            ${translate(DAY_TYPE_TRANSLATION, day.events.shiftType)} |
+            ${[...hourTypes].join(', ')}
+          </div>
+        </div>
+        <div class="toggle">▶</div>
+      </div>
+
+      <div class="day-content">
+        <div>
+          <span class="tag">Horas esperadas: ${expected}h</span>
+          <span class="tag">
+            Tipo do dia: ${translate(DAY_TYPE_TRANSLATION, day.events.shiftType)}
+          </span>
+        </div>
+
+        <div class="timeline">
+          ${day.timeline.map(t => `
+            <div class="event ${t.type.includes('nightly') ? 'nightly' : 'shift'}">
+              <strong>
+                ${translate(
+                  HOUR_TYPE_TRANSLATION,
+                  t.options?.shift?.DESC_TIPO_HORA || 'Hora padrão'
+                )}
+              </strong><br>
+              ${t.startInfo} → ${t.endInfo}<br>
+              Tipos:
+              ${t.type.map(tp => translate(TYPE_TRANSLATION, tp)).join(', ')}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="explain">
+          <strong>🧠 Explicação da Apuração</strong><br>
+          ${expected === 0 ? '• Dia sem carga horária prevista.<br>' : ''}
+          • Jornada aplicada classificou o dia como
+          <strong>${translate(DAY_TYPE_TRANSLATION, day.events.shiftType)}</strong>.<br>
+          • Tipo(s) de hora gerado(s):
+          <strong>${[...hourTypes].join(', ')}</strong>.<br>
+          ${hasNight ? '• Houve incidência de período noturno.<br>' : ''}
+          • Apuração realizada com base em regras de escala e jornada,
+          sem marcações de ponto.
+        </div>
+      </div>
+    `;
+
+    content.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
